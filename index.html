@@ -30,8 +30,8 @@ body {
 
 /* ---------- MAIN CARD ---------- */
 .card {
-    position: relative; /* for hearts */
-    overflow: hidden;   /* keep hearts inside */
+    position: relative;
+    overflow: hidden;
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 28px;
@@ -84,15 +84,12 @@ h1 {
     text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
 }
 
-/* SUBTITLE */
 .subtitle {
-    font-family: 'Poppins', sans-serif;
     font-size: 14px;
     color: #555;
     margin-bottom: 22px;
 }
 
-/* NAMES */
 .names {
     font-family: 'Dancing Script', cursive;
     font-size: 32px;
@@ -101,7 +98,7 @@ h1 {
     margin-bottom: 30px;
 }
 
-/* TIMER GRID */
+/* TIMER */
 .timer {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -109,13 +106,13 @@ h1 {
 }
 
 .unit {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255,255,255,0.95);
     border-radius: 18px;
     padding: 18px 10px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     transition: transform 0.3s ease;
-    z-index: 1;
     position: relative;
+    z-index: 1;
 }
 
 .unit:hover {
@@ -123,17 +120,13 @@ h1 {
     box-shadow: 0 12px 28px rgba(230,57,70,0.6);
 }
 
-/* TIMER NUMBERS */
 .value {
-    font-family: 'Poppins', sans-serif;
     font-size: 30px;
     font-weight: 700;
     color: #e63946;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.15);
 }
 
 .label {
-    font-family: 'Poppins', sans-serif;
     font-size: 11px;
     letter-spacing: 1px;
     color: #777;
@@ -142,15 +135,12 @@ h1 {
 
 .wide { grid-column: span 3; }
 
-/* FOOTER */
 footer {
-    margin-top: 28px;
-    font-family: 'Poppins', sans-serif;
+    margin-top: 24px;
     font-size: 14px;
     color: #555;
 }
 
-/* MOBILE */
 @media (max-width: 420px) {
     .timer { grid-template-columns: repeat(2, 1fr); }
     .wide { grid-column: span 2; }
@@ -159,6 +149,11 @@ footer {
 </head>
 
 <body>
+
+<!-- 🎵 Background Music (No Controls) -->
+<audio id="bgMusic" loop>
+    <source src="music.mp3.mpeg" type="audio/mpeg">
+</audio>
 
 <div class="card" id="card">
     <h1>Two Hearts, One Countdown</h1>
@@ -181,7 +176,7 @@ footer {
             <div class="value" id="hours">0</div>
             <div class="label">HOURS</div>
         </div>
-        <div class="unit">
+        <div class="unit wide">
             <div class="value" id="minutes">0</div>
             <div class="label">MINUTES</div>
         </div>
@@ -191,9 +186,7 @@ footer {
         </div>
     </div>
 
-    <footer>
-        Counting every moment till our forever ✨
-    </footer>
+    <footer>Counting every moment till our forever ✨</footer>
 </div>
 
 <script>
@@ -219,12 +212,13 @@ function updateCountdown() {
     if (seconds < 0) { seconds += 60; minutes--; }
     if (minutes < 0) { minutes += 60; hours--; }
     if (hours < 0) { hours += 24; days--; }
-    if (days < 0) { days += new Date(now.getFullYear(), now.getMonth()+1, 0).getDate(); months--; }
+    if (days < 0) {
+        days += new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+        months--;
+    }
     if (months < 0) { months += 12; years--; }
 
-    const totalMonths = years*12 + months;
-
-    document.getElementById("months").textContent = totalMonths;
+    document.getElementById("months").textContent = years*12 + months;
     document.getElementById("days").textContent = days;
     document.getElementById("hours").textContent = hours;
     document.getElementById("minutes").textContent = minutes;
@@ -233,38 +227,31 @@ function updateCountdown() {
 setInterval(updateCountdown, 1000);
 updateCountdown();
 
-// ---------- CONTINUOUS FLOATING HEARTS ----------
+// ---------- FLOATING HEARTS ----------
 const card = document.getElementById("card");
 
 function createHeart() {
     const heart = document.createElement("div");
     heart.className = "heart";
-    heart.style.left = Math.random()*card.clientWidth + "px";
+    heart.style.left = Math.random() * card.clientWidth + "px";
     heart.style.top = card.clientHeight + "px";
-    heart.style.animationDuration = (4 + Math.random()*3) + "s"; // random speed
+    heart.style.animationDuration = (4 + Math.random()*3) + "s";
     card.appendChild(heart);
-
     setTimeout(() => heart.remove(), 7000);
 }
-
-// continuously generate hearts
 setInterval(createHeart, 400);
 
-// ---------- INTERACTIVE FLOAT ----------
-function speedHearts() {
-    const hearts = document.querySelectorAll(".heart");
-    hearts.forEach(h => {
-        h.style.animationDuration = "2s"; // faster
-        h.style.transform += " scale(1.2)";
-    });
-}
+// ---------- BACKGROUND MUSIC (AUTOPLAY SAFE) ----------
+const music = document.getElementById("bgMusic");
+music.volume = 0.5;
 
-// hover for desktop
-card.addEventListener("mousemove", speedHearts);
-// touch for mobile
-card.addEventListener("touchmove", speedHearts);
+// Try autoplay
+music.play().catch(() => {
+    // Play on first user interaction (required by browsers)
+    document.addEventListener("click", () => music.play(), { once: true });
+    document.addEventListener("touchstart", () => music.play(), { once: true });
+});
 </script>
 
 </body>
-
 </html>
