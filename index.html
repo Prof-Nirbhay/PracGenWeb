@@ -5,255 +5,269 @@
 <title>Nirbhay ❤️ Shalu | Wedding Countdown</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@700&family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
 
 <style>
 /* ---------- BACKGROUND ---------- */
-body {
-    margin: 0;
-    height: 100vh;
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(120deg, #fde2e4, #fad2e1, #e2ece9, #bee1e6);
-    background-size: 300% 300%;
-    animation: bgFlow 14s ease infinite;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+body{
+    margin:0;
+    height:100vh;
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(120deg,#fde2e4,#fad2e1,#e2ece9,#bee1e6);
+    background-size:300% 300%;
+    animation:bgFlow 14s ease infinite;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
-@keyframes bgFlow {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+@keyframes bgFlow{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
 }
 
 /* ---------- MAIN CARD ---------- */
-.card {
-    position: relative;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 28px;
-    padding: 42px 36px;
-    width: 92%;
-    max-width: 460px;
-    text-align: center;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.18);
-    animation: fadeUp 1.2s ease;
+.card{
+    position:relative;
+    overflow:hidden;
+    background:rgba(255,255,255,.95);
+    border-radius:28px;
+    padding:42px 36px;
+    width:92%;
+    max-width:460px;
+    text-align:center;
+    box-shadow:0 25px 60px rgba(0,0,0,.18);
 }
 
-/* ---------- HEARTS ---------- */
-.heart {
-    position: absolute;
-    width: 14px;
-    height: 14px;
-    background-color: #e63946;
-    transform: rotate(-45deg);
-    opacity: 0.8;
-    pointer-events: none;
-    z-index: 0;
-    animation: floatUp linear infinite;
+/* ---------- COUNTDOWN FLOATING HEARTS ---------- */
+.count-heart{
+    position:absolute;
+    width:14px;
+    height:14px;
+    background:#e63946;
+    transform:rotate(-45deg);
+    opacity:.8;
+    pointer-events:none;
+    z-index:1;
+    animation:floatUp linear infinite;
 }
 
-.heart:before,
-.heart:after {
-    content: "";
-    position: absolute;
-    width: 14px;
-    height: 14px;
-    background-color: #e63946;
-    border-radius: 50%;
+.count-heart::before,
+.count-heart::after{
+    content:"";
+    position:absolute;
+    width:14px;
+    height:14px;
+    background:#e63946;
+    border-radius:50%;
 }
 
-.heart:before { top: -7px; left: 0; }
-.heart:after { left: 7px; top: 0; }
-
-@keyframes floatUp {
-    0% { transform: translateY(0) rotate(-45deg); opacity: 0.8; }
-    50% { opacity: 1; }
-    100% { transform: translateY(-300px) rotate(-45deg); opacity: 0; }
+.count-heart::before{
+    top:-7px;
+    left:0;
 }
 
-/* ---------- HEADINGS ---------- */
-h1 {
-    font-family: 'Great Vibes', cursive;
-    font-size: 42px;
-    color: #e63946;
-    margin-bottom: 6px;
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+.count-heart::after{
+    left:7px;
+    top:0;
 }
 
-.subtitle {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 22px;
+@keyframes floatUp{
+    0%{transform:translateY(0) rotate(-45deg);opacity:.8}
+    100%{transform:translateY(-300px) rotate(-45deg);opacity:0}
 }
 
-.names {
-    font-family: 'Dancing Script', cursive;
-    font-size: 32px;
-    font-weight: 700;
-    color: #ff4d6d;
-    margin-bottom: 30px;
+/* ---------- TEXT ---------- */
+h1{
+    font-family:'Great Vibes',cursive;
+    font-size:42px;
+    color:#e63946;
 }
 
-/* TIMER */
-.timer {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+.subtitle{
+    font-size:14px;
+    color:#555;
+    margin-bottom:18px;
 }
 
-.unit {
-    background: rgba(255,255,255,0.95);
-    border-radius: 18px;
-    padding: 18px 10px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease;
-    position: relative;
-    z-index: 1;
+.names{
+    font-family:'Dancing Script',cursive;
+    font-size:32px;
+    color:#ff4d6d;
+    margin-bottom:26px;
 }
 
-.unit:hover {
-    transform: scale(1.1);
-    box-shadow: 0 12px 28px rgba(230,57,70,0.6);
+.heart-btn{
+    cursor:pointer;
+    transition:.3s;
+}
+.heart-btn:hover{transform:scale(1.4)}
+
+/* ---------- TIMER ---------- */
+.timer{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
 }
 
-.value {
-    font-size: 30px;
-    font-weight: 700;
-    color: #e63946;
+.unit{
+    background:#fff;
+    border-radius:18px;
+    padding:18px 10px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
 
-.label {
-    font-size: 11px;
-    letter-spacing: 1px;
-    color: #777;
-    margin-top: 6px;
+.value{
+    font-size:30px;
+    font-weight:700;
+    color:#e63946;
 }
 
-.wide { grid-column: span 3; }
-
-footer {
-    margin-top: 24px;
-    font-size: 14px;
-    color: #555;
+.label{
+    font-size:11px;
+    color:#777;
 }
 
-@media (max-width: 420px) {
-    .timer { grid-template-columns: repeat(2, 1fr); }
-    .wide { grid-column: span 2; }
+.wide{grid-column:span 3}
+
+footer{
+    margin-top:22px;
+    font-size:14px;
+    color:#555;
+}
+
+/* ---------- MEMORY MODAL ---------- */
+.memory-modal{
+    position:fixed;
+    inset:0;
+    background:linear-gradient(120deg,#ffdde1,#ee9ca7);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+    overflow:hidden;
+}
+
+/* MEMORY BIG HEART */
+.memory-heart{
+    width:min(80vw,320px);
+    height:min(80vw,320px);
+    background:#e63946;
+    position:relative;
+    transform:rotate(-45deg);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.memory-heart::before,
+.memory-heart::after{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:#e63946;
+    border-radius:50%;
+}
+
+.memory-heart::before{top:-50%}
+.memory-heart::after{left:50%}
+
+/* VADA TEXT */
+.vada{
+    transform:rotate(45deg);
+    color:#fff;
+    font-size:clamp(15px,4vw,22px);
+    font-family:'Dancing Script',cursive;
+    text-align:center;
+    padding:22px;
+    line-height:1.6;
+    z-index:2;
+}
+
+/* MOBILE */
+@media(max-width:420px){
+    .timer{grid-template-columns:repeat(2,1fr)}
+    .wide{grid-column:span 2}
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🎵 Background Music (No Controls) -->
-<audio id="bgMusic" loop>
-    <source src="music.mp3" type="audio/mpeg">
-</audio>
-
 <div class="card" id="card">
     <h1>Two Hearts, One Countdown</h1>
     <div class="subtitle">A beautiful beginning awaits 💕</div>
 
     <div class="names">
-        Shalu <span>❤️</span> Nirbhay
+        Shalu <span class="heart-btn" id="openMemories">❤️</span> Nirbhay
     </div>
 
     <div class="timer">
-        <div class="unit">
-            <div class="value" id="months">0</div>
-            <div class="label">MONTHS</div>
-        </div>
-        <div class="unit">
-            <div class="value" id="days">0</div>
-            <div class="label">DAYS</div>
-        </div>
-        <div class="unit">
-            <div class="value" id="hours">0</div>
-            <div class="label">HOURS</div>
-        </div>
-        <div class="unit">
-            <div class="value" id="minutes">0</div>
-            <div class="label">MINUTES</div>
-        </div>
-        <div class="unit wide">
-            <div class="value" id="seconds">0</div>
-            <div class="label">SECONDS</div>
-        </div>
+        <div class="unit"><div class="value" id="months">0</div><div class="label">MONTHS</div></div>
+        <div class="unit"><div class="value" id="days">0</div><div class="label">DAYS</div></div>
+        <div class="unit"><div class="value" id="hours">0</div><div class="label">HOURS</div></div>
+        <div class="unit"><div class="value" id="minutes">0</div><div class="label">MINUTES</div></div>
+        <div class="unit wide"><div class="value" id="seconds">0</div><div class="label">SECONDS</div></div>
     </div>
 
     <footer>Counting every moment till our forever ✨</footer>
 </div>
 
+<!-- MEMORY MODAL -->
+<div class="memory-modal" id="memoryModal">
+    <div class="memory-heart">
+        <div class="vada">
+            मैं वादा करता हूँ 💍<br>
+            हर दिन आपको थोड़ा और समझूँगा,<br>
+            आपकी मुस्कान को अपनी आदत बनाऊँगा 😊<br>
+            आपके सपनों को अपना मानूँगा ✨<br>
+            और हर हाल में, हर मोड़ पर<br>
+            आपका हाथ थामे रखूँगा 🤝❤️
+        </div>
+    </div>
+</div>
+
 <script>
-// ---------- COUNTDOWN ----------
-const weddingDate = new Date(2026, 10, 30, 0, 0, 0);
+/* COUNTDOWN */
+const weddingDate=new Date(2026,10,30);
+function updateCountdown(){
+    const now=new Date();
+    let diff=weddingDate-now;
+    if(diff<=0)return;
 
-function updateCountdown() {
-    const now = new Date();
-    if (now >= weddingDate) {
-        document.body.innerHTML = `<h1 style="font-family:'Great Vibes', cursive; color:#e63946; text-align:center;">
-            Just Married 💍<br>Nirbhay ❤️ Shalu
-        </h1>`;
-        return;
-    }
+    let s=Math.floor(diff/1000),
+        m=Math.floor(s/60),
+        h=Math.floor(m/60),
+        d=Math.floor(h/24);
 
-    let years = weddingDate.getFullYear() - now.getFullYear();
-    let months = weddingDate.getMonth() - now.getMonth();
-    let days = weddingDate.getDate() - now.getDate();
-    let hours = weddingDate.getHours() - now.getHours();
-    let minutes = weddingDate.getMinutes() - now.getMinutes();
-    let seconds = weddingDate.getSeconds() - now.getSeconds();
-
-    if (seconds < 0) { seconds += 60; minutes--; }
-    if (minutes < 0) { minutes += 60; hours--; }
-    if (hours < 0) { hours += 24; days--; }
-    if (days < 0) {
-        days += new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
-        months--;
-    }
-    if (months < 0) { months += 12; years--; }
-
-    document.getElementById("months").textContent = years*12 + months;
-    document.getElementById("days").textContent = days;
-    document.getElementById("hours").textContent = hours;
-    document.getElementById("minutes").textContent = minutes;
-    document.getElementById("seconds").textContent = seconds;
+    months.textContent=Math.floor(d/30);
+    days.textContent=d%30;
+    hours.textContent=h%24;
+    minutes.textContent=m%60;
+    seconds.textContent=s%60;
 }
-setInterval(updateCountdown, 1000);
+setInterval(updateCountdown,1000);
 updateCountdown();
 
-// ---------- FLOATING HEARTS ----------
-const card = document.getElementById("card");
+/* FLOATING COUNTDOWN HEARTS */
+const card=document.getElementById("card");
+setInterval(()=>{
+    const h=document.createElement("div");
+    h.className="count-heart";
+    h.style.left=Math.random()*card.clientWidth+"px";
+    h.style.top=card.clientHeight+"px";
+    h.style.animationDuration=(4+Math.random()*3)+"s";
+    card.appendChild(h);
+    setTimeout(()=>h.remove(),7000);
+},400);
 
-function createHeart() {
-    const heart = document.createElement("div");
-    heart.className = "heart";
-    heart.style.left = Math.random() * card.clientWidth + "px";
-    heart.style.top = card.clientHeight + "px";
-    heart.style.animationDuration = (4 + Math.random()*3) + "s";
-    card.appendChild(heart);
-    setTimeout(() => heart.remove(), 7000);
-}
-setInterval(createHeart, 400);
-
-// ---------- BACKGROUND MUSIC (AUTOPLAY SAFE) ----------
-const music = document.getElementById("bgMusic");
-music.volume = 0.5;
-
-// Try autoplay
-music.play().catch(() => {
-    // Play on first user interaction (required by browsers)
-    document.addEventListener("click", () => music.play(), { once: true });
-    document.addEventListener("touchstart", () => music.play(), { once: true });
-});
+/* MEMORY MODAL */
+const modal=document.getElementById("memoryModal");
+openMemories.onclick=()=>modal.style.display="flex";
+modal.onclick=()=>modal.style.display="none";
 </script>
 
 </body>
 </html>
-
-
