@@ -38,14 +38,14 @@ body{
     overflow:hidden;
 }
 
-/* COUNTDOWN HEARTS */
+/* PERFECT HEART SHAPE */
 .count-heart{
     position:absolute;
     width:14px;
     height:14px;
     background:#e63946;
     transform:rotate(-45deg);
-    opacity:.8;
+    opacity:.85;
     animation:floatUp linear infinite;
 }
 .count-heart::before,
@@ -57,8 +57,15 @@ body{
     background:#e63946;
     border-radius:50%;
 }
-.count-heart::before{top:-7px}
-.count-heart::after{left:7px}
+.count-heart::before{
+    top:-7px;
+    left:0;
+}
+.count-heart::after{
+    left:7px;
+    top:0;
+}
+
 @keyframes floatUp{
     0%{transform:translateY(0) rotate(-45deg);opacity:.8}
     100%{transform:translateY(-320px) rotate(-45deg);opacity:0}
@@ -99,7 +106,7 @@ footer{margin-top:22px;font-size:14px;color:#555}
     z-index:999;
 }
 
-/* HEART */
+/* BIG HEART */
 .memory-heart{
     width:min(80vw,320px);
     height:min(80vw,320px);
@@ -152,14 +159,13 @@ footer{margin-top:22px;font-size:14px;color:#555}
 
 <body>
 
-<!-- COUNTDOWN MUSIC -->
+<!-- MUSIC -->
 <audio id="countdownMusic" loop>
-  <source src="music.mp3">
+  <source src="music.mp3" type="audio/mpeg">
 </audio>
 
-<!-- MEMORY MUSIC -->
 <audio id="memoryMusic" loop>
-  <source src="music1.mp3">
+  <source src="music1.mp3" type="audio/mpeg">
 </audio>
 
 <div class="card" id="card">
@@ -225,17 +231,15 @@ setInterval(()=>{
     setTimeout(()=>h.remove(),7000);
 },400);
 
-/* MUSIC LOGIC */
+/* MUSIC */
 const countdownMusic=document.getElementById("countdownMusic");
 const memoryMusic=document.getElementById("memoryMusic");
 const modal=document.getElementById("memoryModal");
 
-/* Start countdown music on first click */
 document.body.addEventListener("click",()=>{
     countdownMusic.play().catch(()=>{});
 },{once:true});
 
-/* Open heart */
 openMemories.onclick=()=>{
     modal.style.display="flex";
     countdownMusic.pause();
@@ -243,7 +247,6 @@ openMemories.onclick=()=>{
     memoryMusic.play().catch(()=>{});
 };
 
-/* Close modal */
 modal.onclick=()=>{
     modal.style.display="none";
     memoryMusic.pause();
@@ -264,4 +267,3 @@ setInterval(()=>{
 
 </body>
 </html>
-
