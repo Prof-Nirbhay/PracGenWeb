@@ -8,7 +8,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@700&family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
 
 <style>
-/* ---------- BACKGROUND ---------- */
 body{
     margin:0;
     height:100vh;
@@ -20,17 +19,15 @@ body{
     justify-content:center;
     align-items:center;
 }
-
 @keyframes bgFlow{
     0%{background-position:0% 50%}
     50%{background-position:100% 50%}
     100%{background-position:0% 50%}
 }
 
-/* ---------- MAIN CARD ---------- */
+/* CARD */
 .card{
     position:relative;
-    overflow:hidden;
     background:rgba(255,255,255,.95);
     border-radius:28px;
     padding:42px 36px;
@@ -38,106 +35,58 @@ body{
     max-width:460px;
     text-align:center;
     box-shadow:0 25px 60px rgba(0,0,0,.18);
+    overflow:hidden;
 }
 
-/* ---------- COUNTDOWN FLOATING HEARTS ---------- */
+/* FLOATING HEARTS */
 .count-heart{
     position:absolute;
-    width:14px;
-    height:14px;
+    width:14px;height:14px;
     background:#e63946;
     transform:rotate(-45deg);
-    opacity:.8;
-    pointer-events:none;
-    z-index:1;
+    opacity:.7;
     animation:floatUp linear infinite;
 }
-
-.count-heart::before,
-.count-heart::after{
+.count-heart::before,.count-heart::after{
     content:"";
     position:absolute;
-    width:14px;
-    height:14px;
+    width:14px;height:14px;
     background:#e63946;
     border-radius:50%;
 }
-
-.count-heart::before{
-    top:-7px;
-    left:0;
-}
-
-.count-heart::after{
-    left:7px;
-    top:0;
-}
-
+.count-heart::before{top:-7px}
+.count-heart::after{left:7px}
 @keyframes floatUp{
-    0%{transform:translateY(0) rotate(-45deg);opacity:.8}
-    100%{transform:translateY(-300px) rotate(-45deg);opacity:0}
+    0%{transform:translateY(0) rotate(-45deg)}
+    100%{transform:translateY(-320px) rotate(-45deg);opacity:0}
 }
 
-/* ---------- TEXT ---------- */
-h1{
-    font-family:'Great Vibes',cursive;
-    font-size:42px;
-    color:#e63946;
-}
-
-.subtitle{
-    font-size:14px;
-    color:#555;
-    margin-bottom:18px;
-}
-
-.names{
-    font-family:'Dancing Script',cursive;
-    font-size:32px;
-    color:#ff4d6d;
-    margin-bottom:26px;
-}
-
-.heart-btn{
-    cursor:pointer;
-    transition:.3s;
-}
+/* TEXT */
+h1{font-family:'Great Vibes',cursive;font-size:42px;color:#e63946}
+.subtitle{font-size:14px;color:#555;margin-bottom:18px}
+.names{font-family:'Dancing Script',cursive;font-size:32px;color:#ff4d6d;margin-bottom:26px}
+.heart-btn{cursor:pointer;transition:.3s}
 .heart-btn:hover{transform:scale(1.4)}
 
-/* ---------- TIMER ---------- */
+/* TIMER */
 .timer{
     display:grid;
     grid-template-columns:repeat(3,1fr);
     gap:16px;
 }
-
 .unit{
     background:#fff;
     border-radius:18px;
     padding:18px 10px;
     box-shadow:0 10px 25px rgba(0,0,0,.08);
 }
-
-.value{
-    font-size:30px;
-    font-weight:700;
-    color:#e63946;
-}
-
-.label{
-    font-size:11px;
-    color:#777;
-}
-
+.value{font-size:30px;font-weight:700;color:#e63946}
+.label{font-size:11px;color:#777}
 .wide{grid-column:span 3}
 
-footer{
-    margin-top:22px;
-    font-size:14px;
-    color:#555;
-}
+footer{margin-top:22px;font-size:14px;color:#555}
 
-/* ---------- MEMORY MODAL ---------- */
+/* MODAL */
 .memory-modal{
     position:fixed;
     inset:0;
@@ -146,10 +95,9 @@ footer{
     justify-content:center;
     align-items:center;
     z-index:999;
-    overflow:hidden;
 }
 
-/* MEMORY BIG HEART */
+/* HEART */
 .memory-heart{
     width:min(80vw,320px);
     height:min(80vw,320px);
@@ -160,7 +108,6 @@ footer{
     justify-content:center;
     align-items:center;
 }
-
 .memory-heart::before,
 .memory-heart::after{
     content:"";
@@ -170,11 +117,24 @@ footer{
     background:#e63946;
     border-radius:50%;
 }
-
 .memory-heart::before{top:-50%}
 .memory-heart::after{left:50%}
 
-/* VADA TEXT */
+/* SPARKLES */
+.sparkle{
+    position:absolute;
+    width:6px;height:6px;
+    background:white;
+    border-radius:50%;
+    animation:spark 2s linear infinite;
+    opacity:.8;
+}
+@keyframes spark{
+    0%{transform:scale(0);opacity:1}
+    100%{transform:scale(1.8);opacity:0}
+}
+
+/* VADA */
 .vada{
     transform:rotate(45deg);
     color:#fff;
@@ -196,6 +156,11 @@ footer{
 
 <body>
 
+<!-- MUSIC -->
+<audio id="bgMusic" loop>
+    <source src="https://cdn.pixabay.com/audio/2023/03/28/audio_0c90c46f7b.mp3" type="audio/mpeg">
+</audio>
+
 <div class="card" id="card">
     <h1>Two Hearts, One Countdown</h1>
     <div class="subtitle">A beautiful beginning awaits 💕</div>
@@ -215,9 +180,9 @@ footer{
     <footer>Counting every moment till our forever ✨</footer>
 </div>
 
-<!-- MEMORY MODAL -->
+<!-- MODAL -->
 <div class="memory-modal" id="memoryModal">
-    <div class="memory-heart">
+    <div class="memory-heart" id="heart">
         <div class="vada">
             मैं वादा करता हूँ 💍<br>
             हर दिन आपको थोड़ा और समझूँगा,<br>
@@ -236,12 +201,10 @@ function updateCountdown(){
     const now=new Date();
     let diff=weddingDate-now;
     if(diff<=0)return;
-
     let s=Math.floor(diff/1000),
         m=Math.floor(s/60),
         h=Math.floor(m/60),
         d=Math.floor(h/24);
-
     months.textContent=Math.floor(d/30);
     days.textContent=d%30;
     hours.textContent=h%24;
@@ -251,22 +214,35 @@ function updateCountdown(){
 setInterval(updateCountdown,1000);
 updateCountdown();
 
-/* FLOATING COUNTDOWN HEARTS */
-const card=document.getElementById("card");
+/* FLOATING HEARTS */
 setInterval(()=>{
     const h=document.createElement("div");
     h.className="count-heart";
     h.style.left=Math.random()*card.clientWidth+"px";
-    h.style.top=card.clientHeight+"px";
+    h.style.bottom="0";
     h.style.animationDuration=(4+Math.random()*3)+"s";
     card.appendChild(h);
     setTimeout(()=>h.remove(),7000);
 },400);
 
-/* MEMORY MODAL */
+/* MODAL + MUSIC */
 const modal=document.getElementById("memoryModal");
-openMemories.onclick=()=>modal.style.display="flex";
+const music=document.getElementById("bgMusic");
+openMemories.onclick=()=>{
+    modal.style.display="flex";
+    music.play();
+};
 modal.onclick=()=>modal.style.display="none";
+
+/* SPARKLES */
+setInterval(()=>{
+    const s=document.createElement("div");
+    s.className="sparkle";
+    s.style.left=Math.random()*100+"%";
+    s.style.top=Math.random()*100+"%";
+    heart.appendChild(s);
+    setTimeout(()=>s.remove(),2000);
+},300);
 </script>
 
 </body>
