@@ -25,7 +25,6 @@ body{
     100%{background-position:0% 50%}
 }
 
-/* CARD */
 .card{
     position:relative;
     background:rgba(255,255,255,.95);
@@ -38,14 +37,14 @@ body{
     overflow:hidden;
 }
 
-/* PERFECT HEART SHAPE */
+/* COUNTDOWN HEARTS */
 .count-heart{
     position:absolute;
     width:14px;
     height:14px;
     background:#e63946;
     transform:rotate(-45deg);
-    opacity:.85;
+    opacity:.8;
     animation:floatUp linear infinite;
 }
 .count-heart::before,
@@ -57,28 +56,18 @@ body{
     background:#e63946;
     border-radius:50%;
 }
-.count-heart::before{
-    top:-7px;
-    left:0;
-}
-.count-heart::after{
-    left:7px;
-    top:0;
-}
+.count-heart::before{top:-7px;left:0}
+.count-heart::after{left:7px;top:0}
 
 @keyframes floatUp{
     0%{transform:translateY(0) rotate(-45deg);opacity:.8}
     100%{transform:translateY(-320px) rotate(-45deg);opacity:0}
 }
 
-/* TEXT */
 h1{font-family:'Great Vibes',cursive;font-size:42px;color:#e63946}
 .subtitle{font-size:14px;color:#555;margin-bottom:18px}
 .names{font-family:'Dancing Script',cursive;font-size:32px;color:#ff4d6d;margin-bottom:26px}
-.heart-btn{cursor:pointer;transition:.3s}
-.heart-btn:hover{transform:scale(1.4)}
 
-/* TIMER */
 .timer{
     display:grid;
     grid-template-columns:repeat(3,1fr);
@@ -93,6 +82,7 @@ h1{font-family:'Great Vibes',cursive;font-size:42px;color:#e63946}
 .value{font-size:30px;font-weight:700;color:#e63946}
 .label{font-size:11px;color:#777}
 .wide{grid-column:span 3}
+
 footer{margin-top:22px;font-size:14px;color:#555}
 
 /* MODAL */
@@ -106,7 +96,7 @@ footer{margin-top:22px;font-size:14px;color:#555}
     z-index:999;
 }
 
-/* BIG HEART */
+/* HEART */
 .memory-heart{
     width:min(80vw,320px);
     height:min(80vw,320px);
@@ -143,7 +133,6 @@ footer{margin-top:22px;font-size:14px;color:#555}
     100%{transform:scale(2);opacity:0}
 }
 
-/* VADA */
 .vada{
     transform:rotate(45deg);
     color:#fff;
@@ -159,29 +148,23 @@ footer{margin-top:22px;font-size:14px;color:#555}
 
 <body>
 
-<!-- MUSIC -->
-<audio id="countdownMusic" loop>
-  <source src="music.mp3" type="audio/mpeg">
-</audio>
-
-<audio id="memoryMusic" loop>
-  <source src="music1.mp3" type="audio/mpeg">
-</audio>
+<audio id="countdownMusic" loop src="music.mp3"></audio>
+<audio id="memoryMusic" loop src="music1.mp3"></audio>
 
 <div class="card" id="card">
     <h1>Two Hearts, One Countdown</h1>
     <div class="subtitle">A beautiful beginning awaits 💕</div>
 
     <div class="names">
-        Shalu <span class="heart-btn" id="openMemories">❤️</span> Nirbhay
+        Shalu <span id="openMemories">❤️</span> Nirbhay
     </div>
 
     <div class="timer">
-        <div class="unit"><div class="value" id="months">0</div><div class="label">MONTHS</div></div>
-        <div class="unit"><div class="value" id="days">0</div><div class="label">DAYS</div></div>
-        <div class="unit"><div class="value" id="hours">0</div><div class="label">HOURS</div></div>
-        <div class="unit wide"><div class="value" id="minutes">0</div><div class="label">MINUTES</div></div>
-        <div class="unit wide"><div class="value" id="seconds">0</div><div class="label">SECONDS</div></div>
+        <div class="unit"><div class="value" id="months"></div><div class="label">MONTHS</div></div>
+        <div class="unit"><div class="value" id="days"></div><div class="label">DAYS</div></div>
+        <div class="unit"><div class="value" id="hours"></div><div class="label">HOURS</div></div>
+        <div class="unit wide"><div class="value" id="minutes"></div><div class="label">MINUTES</div></div>
+        <div class="unit wide"><div class="value" id="seconds"></div><div class="label">SECONDS</div></div>
     </div>
 
     <footer>Counting every moment till our forever ✨</footer>
@@ -201,8 +184,13 @@ footer{margin-top:22px;font-size:14px;color:#555}
 </div>
 
 <script>
-/* COUNTDOWN */
 const weddingDate=new Date(2026,10,30);
+const card=document.getElementById("card");
+const modal=document.getElementById("memoryModal");
+const heart=document.getElementById("heart");
+const countdownMusic=document.getElementById("countdownMusic");
+const memoryMusic=document.getElementById("memoryMusic");
+
 function updateCountdown(){
     const now=new Date();
     let diff=weddingDate-now;
@@ -220,7 +208,7 @@ function updateCountdown(){
 setInterval(updateCountdown,1000);
 updateCountdown();
 
-/* HEART FLOAT */
+/* floating hearts */
 setInterval(()=>{
     const h=document.createElement("div");
     h.className="count-heart";
@@ -231,21 +219,20 @@ setInterval(()=>{
     setTimeout(()=>h.remove(),7000);
 },400);
 
-/* MUSIC */
-const countdownMusic=document.getElementById("countdownMusic");
-const memoryMusic=document.getElementById("memoryMusic");
-const modal=document.getElementById("memoryModal");
-
+/* music */
 document.body.addEventListener("click",()=>{
     countdownMusic.play().catch(()=>{});
 },{once:true});
 
-openMemories.onclick=()=>{
+openMemories.onclick=(e)=>{
+    e.stopPropagation();
     modal.style.display="flex";
     countdownMusic.pause();
     memoryMusic.currentTime=0;
     memoryMusic.play().catch(()=>{});
 };
+
+heart.onclick=e=>e.stopPropagation();
 
 modal.onclick=()=>{
     modal.style.display="none";
@@ -253,7 +240,7 @@ modal.onclick=()=>{
     countdownMusic.play().catch(()=>{});
 };
 
-/* SPARKLES */
+/* sparkles */
 setInterval(()=>{
     if(modal.style.display!=="flex")return;
     const s=document.createElement("div");
