@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Logistic Regression – Y = 0 / 1 Demo</title>
+
+<style>
+body {
+    background: #020617;
+    color: #e5e7eb;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+canvas {
+    background: #020617;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(34,197,94,0.5);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<div>
+    <h2>Logistic Regression</h2>
+    <canvas id="canvas" width="720" height="480"></canvas>
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+// Model parameters
+let w = 0.6;
+let b = -3.5;
+let lr = 0.08;
+
+// Data storage
+let data = [];
+let index = 0;
+
+// Generate dataset (x → feature, y → label 0 or 1)
+const fullData = [];
+for (let i = 0; i < 25; i++) {
+    let x = Math.random() * 10;
+    let y = x > 5 ? 1 : 0;   // TRUE class
+    fullData.push({ x, y });
+}
+
+// Sigmoid function
+function sigmoid(z) {
+    return 1 / (1 + Math.exp(-z));
+}
+
+// Insert one data point at a time
+function insertData() {
+    if (index < fullData.length) {
+        data.push(fullData[index]);
+        index++;
+    }
+}
+
+// Train model
+function train() {
+    if (data.length === 0) return;
+
+    let dw = 0;
+    let db = 0;
+
+    data.forEach(p => {
+        let pred = sigmoid(w * p.x + b);
+        dw += (pred - p.y) * p.x;
+        db += (pred - p.y);
+    });
+
+    w -= lr * dw / data.length;
+    b -= lr * db / data.length;
+}
+
+// Draw axes
+function drawAxes() {
+    ctx.strokeStyle = "#64748b";
+    ctx.lineWidth = 1;
+
+    // X-axis
+    ctx.beginPath();
+    ctx.moveTo(60, 420);
+    ctx.lineTo(680, 420);
+    ctx.stroke();
+
+    // Y-axis
+    ctx.beginPath();
+    ctx.moveTo(60, 60);
+    ctx.lineTo(60, 420);
+    ctx.stroke();
+
+    // Y labels
+    ctx.fillStyle = "#e5e7eb";
+    ctx.fillText("1", 35, 80);
+    ctx.fillText("0.5", 28, 240);
+    ctx.fillText("0", 40, 425);
+}
+
+// Convert probability to canvas Y
+function yToCanvas(prob) {
+    return 420 - prob * 360;
+}
+
+// Draw threshold line (y = 0.5)
+function drawThreshold() {
+    const y = yToCanvas(0.5);
+
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath();
+    ctx.moveTo(60, y);
+    ctx.lineTo(680, y);
+    ctx.strokeStyle = "#facc15";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = "#facc15";
+    ctx.fillText("Threshold = 0.5", 540, y - 8);
+}
+
+// Draw data points (y = 0 or 1)
+function drawPoints() {
+    data.forEach(p => {
+        let x = 60 + p.x * 60;
+        let y = yToCanvas(p.y);
+
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = p.y === 1 ? "#ef4444" : "#3b82f6";
+        ctx.fill();
+    });
+}
+
+// Draw sigmoid curve
+function drawCurve() {
+    ctx.beginPath();
+    for (let x = 0; x <= 10; x += 0.1) {
+        let px = 60 + x * 60;
+        let py = yToCanvas(sigmoid(w * x + b));
+        if (x === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+    }
+    ctx.strokeStyle = "#22c55e";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+}
+
+// Animation loop
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawAxes();
+    drawThreshold();
+    drawPoints();
+    drawCurve();
+
+    train();
+    requestAnimationFrame(animate);
+}
+
+// Insert data every second
+setInterval(insertData, 1000);
+
+// Start animation
+animate();
+</script>
+
+</body>
+</html>
