@@ -30,7 +30,9 @@ body{
     margin-bottom:15px;
 }
 
-.header img{ height:70px; }
+.header img{
+    height:70px;
+}
 
 .header-text{
     text-align:center;
@@ -46,6 +48,7 @@ label{
 input, textarea, select{
     width:100%;
     padding:6px;
+    font-family:"Times New Roman", Times, serif;
     font-size:12pt;
     margin-top:4px;
 }
@@ -67,9 +70,10 @@ button{
     color:#fff;
 }
 
-button:hover{ background:#163bb3; }
+button:hover{
+    background:#163bb3;
+}
 
-/* Preview Modal */
 .modal{
     display:none;
     position:fixed;
@@ -86,7 +90,10 @@ button:hover{ background:#163bb3; }
     padding:15px;
 }
 
-.modal-actions{ text-align:right; }
+.modal-actions{
+    text-align:right;
+    margin-bottom:8px;
+}
 
 iframe{
     width:100%;
@@ -94,111 +101,23 @@ iframe{
     border:1px solid #000;
 }
 
-/* Help Button */
-.top-help{
-    position:fixed;
-    top:15px;
-    right:20px;
-    z-index:2000;
-}
-
-.top-help button{
-    background:#16a34a;
-    border-radius:20px;
-}
-
-/* Help Modal */
-.help-modal{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.6);
-    justify-content:center;
-    align-items:center;
-    z-index:3000;
-}
-
-.help-box{
-    background:#fff;
-    width:420px;
-    padding:25px;
-    border-radius:12px;
-    animation:fadeIn 0.3s ease;
-}
-
-.help-step{
-    display:flex;
-    gap:10px;
-    margin-bottom:12px;
-}
-
-.help-step span{
-    background:#1f4fd8;
-    color:#fff;
-    width:24px;
-    height:24px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:bold;
-}
-
-.sub-points{
-    margin-left:35px;
-    font-size:12pt;
-}
-
-.close-btn{
-    margin-top:15px;
-    width:100%;
-    padding:8px;
-    background:#ef4444;
-}
-
-@keyframes fadeIn{
-    from{ transform:scale(0.9); opacity:0; }
-    to{ transform:scale(1); opacity:1; }
-}
-
-/* Celebration Confetti */
-.confetti{
-    position:fixed;
-    width:8px;
-    height:8px;
-    top:0;
-    z-index:5000;
-    animation:fall 3s linear forwards;
-}
-
-@keyframes fall{
-    to{
-        transform:translateY(100vh) rotate(720deg);
-        opacity:0;
-    }
-}
-
-.footer{
-  text-align:center;
-  font-size:13px;
-  margin-top:40px;
-  padding:10px;
-  border-top:1px solid #ddd;
+.footer {
+  text-align: center;
+  font-size: 13px;
+  color: #555;
+  margin-top: 40px;
+  padding: 12px 0;
+  border-top: 1px solid #ddd;
 }
 </style>
 </head>
 
 <body>
 
-<!-- Help Button -->
-<div class="top-help">
-    <button onclick="openHelp()">❓ Help</button>
-</div>
-
 <div class="container">
 
 <div class="header">
-    <img src="college_logo.png">
+    <img src="college_logo.png" alt="College Logo">
     <div class="header-text">
         <h2>Practical Exam Question Paper Generator</h2>
         <h4>DEPARTMENT OF ADVANCED COMPUTING</h4>
@@ -210,6 +129,13 @@ iframe{
 <option>FYBSc CS AIML</option>
 <option>SYBSc CS AIML</option>
 <option>TYBSc CS AIML</option>
+<option>FYBSc CS CTIS</option>
+<option>SYBSc CS CTIS</option>
+<option>TYBSc CS CTIS</option>
+<option>FYMSc CS</option>
+<option>SYMSc CS</option>
+<option>FYMSc CS (CYBER)</option>
+<option>SYMSc CS (CYBER)</option>
 <option>SYBSc IT</option>
 <option>FYBSc IT</option>
 </select>
@@ -227,204 +153,203 @@ iframe{
 <textarea id="questions" rows="8"></textarea>
 
 <div class="actions">
-<button onclick="openPreview()">Generate</button>
+<button onclick="openPreview()">Preview</button>
 <button onclick="downloadWord()">Download Word</button>
 </div>
 
 </div>
 
-<!-- Preview Modal -->
 <div class="modal" id="previewModal">
 <div class="modal-box">
 <div class="modal-actions">
-<button onclick="printPaper()">Print</button>
-<button onclick="closePreview()">Close</button>
+    <button onclick="downloadPDF()">Download PDF</button>
+    <button onclick="printPaper()">Print</button>
+    <button onclick="closePreview()">Close</button>
 </div>
 <iframe id="previewFrame"></iframe>
 </div>
 </div>
 
-<!-- Help Modal -->
-<div id="helpModal" class="help-modal">
-  <div class="help-box">
-    <h2>How to Use</h2>
-
-    <div class="help-step"><span>1</span><p>Select Class & Semester</p></div>
-    <div class="help-step"><span>2</span><p>Enter Subject Name</p></div>
-    <div class="help-step"><span>3</span><p>Enter Main Questions (Press Enter)</p></div>
-
-    <ul class="sub-points">
-      <li>One main question per line.</li>
-      <li>Each Enter creates new main question.</li>
-    </ul>
-
-    <div class="help-step"><span>4</span><p>Press TAB for Sub-question</p></div>
-
-    <ul class="sub-points">
-      <li>Sub-questions appear as (a), (b), (c).</li>
-      <li>They belong to previous main question.</li>
-    </ul>
-
-    <div class="help-step"><span>5</span><p>Click Generate</p></div>
-
-    <button class="close-btn" onclick="closeHelp()">Close</button>
-  </div>
-</div>
-
 <script>
 
-/* TAB Support */
-document.getElementById("questions").addEventListener("keydown", function(e){
-    if(e.key==="Tab"){
+    /* Allow TAB inside textarea */
+document.getElementById("questions").addEventListener("keydown", function(e) {
+    if (e.key === "Tab") {
         e.preventDefault();
-        const start=this.selectionStart;
-        const end=this.selectionEnd;
-        this.value=this.value.substring(0,start)+"\t"+this.value.substring(end);
-        this.selectionStart=this.selectionEnd=start+1;
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
+        this.selectionStart = this.selectionEnd = start + 1;
     }
 });
 
-/* Celebration */
-function celebrate(){
-    for(let i=0;i<80;i++){
-        let conf=document.createElement("div");
-        conf.className="confetti";
-        conf.style.left=Math.random()*100+"vw";
-        conf.style.backgroundColor=
-            ["#ef4444","#22c55e","#3b82f6","#facc15","#a855f7"][Math.floor(Math.random()*5)];
-        conf.style.animationDuration=(2+Math.random()*2)+"s";
-        document.body.appendChild(conf);
-        setTimeout(()=>conf.remove(),4000);
-    }
-}
-
-/* Build Paper */
 function buildHTML(){
 
-    const cls=document.getElementById("class").value;
-    const sem=document.getElementById("semester").value;
-    const subject=document.getElementById("subject").value.trim();
+    const cls = document.getElementById("class").value;
+    const sem = document.getElementById("semester").value;
+    const subject = document.getElementById("subject").value.trim();
 
-    const raw=document.getElementById("questions").value
-        .split(/\r?\n/).filter(l=>l.trim()!=="");
+    const rawLines = document.getElementById("questions").value
+        .split(/\r?\n/)
+        .filter(line => line.trim() !== "");
 
-    let qs=[], current=null;
+    let qs = [];
+    let current = null;
 
-    raw.forEach(line=>{
+    rawLines.forEach(line => {
         if(line.startsWith("\t")){
-            if(current) current.sub.push(line.trim());
-        }else{
+            if(current){
+                current.sub.push(line.trim());
+            }
+        } else {
             if(current) qs.push(current);
-            current={main:line.trim(), sub:[]};
+            current = {
+                main: line.trim(),
+                sub: []
+            };
         }
     });
+
     if(current) qs.push(current);
 
-    if(!subject || qs.length<2){
-        alert("Enter subject and at least two main questions.");
+    if(!subject || qs.length < 2){
+        alert("Enter subject name and at least two main questions.");
         return null;
     }
 
-    let html=`<html><body style="font-family:'Times New Roman';font-size:12pt;">`;
+    let html = `
+    <html>
+    <body style="font-family:'Times New Roman'; font-size:12pt; font-weight:bold;">
+    `;
 
-    html+=`
-    <center>
-    <b>NAGINDAS KHANDWALA COLLEGE</b><br>
-    (Empowered Autonomous)<br><br>
-    <b>${cls} SEM ${sem} PRACTICAL EXAMINATION 2026</b>
-    </center><br>
-    <b>Course:</b> ${subject}<br><br>
+    for(let i=0; i<qs.length; i++){
+        for(let j=i+1; j<qs.length; j++){
 
-    <table width="100%" cellpadding="6">
+html += `
+<table width="100%" cellpadding="6" cellspacing="0">
 
-    <tr>
-        <td style="white-space:nowrap;"><b>Q1</b></td>
-        <td width="100%">
-            ${qs[0].main}
-            ${qs[0].sub.map((s,i)=>
-                `<div style="margin-left:25px;">(${String.fromCharCode(97+i)}) ${s}</div>`
-            ).join("")}
-        </td>
-        <td style="white-space:nowrap;" align="right"><b>20</b></td>
-    </tr>
+<tr>
+<td colspan="3" align="center">
+<b>
+NAGINDAS KHANDWALA COLLEGE, MALAD(W)<br>
+(Empowered Autonomous)<br><br>
+${cls} SEM ${sem} PRACTICAL EXAMINATION FEBRUARY- 2026
+</b>
+</td>
+</tr>
 
-    <tr><td colspan="3"><br></td></tr>
+<tr>
+<td colspan="3">
+<table width="100%">
+<tr>
+<td align="left">Time: 2 Hours</td>
+<td align="right">Roll No: __________</td>
+</tr>
+</table>
+</td>
+</tr>
 
-    <tr>
-        <td style="white-space:nowrap;"><b>Q2</b></td>
-        <td width="100%">
-            ${qs[1].main}
-            ${qs[1].sub.map((s,i)=>
-                `<div style="margin-left:25px;">(${String.fromCharCode(97+i)}) ${s}</div>`
-            ).join("")}
-        </td>
-        <td style="white-space:nowrap;" align="right"><b>20</b></td>
-    </tr>
+<tr>
+<td colspan="3">
+<table width="100%">
+<tr>
+<td align="left">Course: ${subject}</td>
+<td align="right">Marks: 50</td>
+</tr>
+</table>
+</td>
+</tr>
 
-    <tr><td colspan="3"><br></td></tr>
+<!-- Q1 -->
+<tr>
+<td align="center" style="white-space:nowrap;"><b>Q1</b></td>
+<td width="100%">
+${qs[i].main}
+${qs[i].sub.map((s,index)=>
+`<div style="margin-left:25px;">(${String.fromCharCode(97+index)}) ${s}</div>`
+).join("")}
+</td>
+<td align="center" style="white-space:nowrap;"><b>20</b></td>
+</tr>
 
-    <tr>
-        <td style="white-space:nowrap;"><b>Q3</b></td>
-        <td>VIVA</td>
-        <td style="white-space:nowrap;" align="right"><b>05</b></td>
-    </tr>
+<!-- Q2 -->
+<tr>
+<td align="center" style="white-space:nowrap;"><b>Q2</b></td>
+<td width="100%">
+${qs[j].main}
+${qs[j].sub.map((s,index)=>
+`<div style="margin-left:25px;">(${String.fromCharCode(97+index)}) ${s}</div>`
+).join("")}
+</td>
+<td align="center" style="white-space:nowrap;"><b>20</b></td>
+</tr>
 
-    <tr>
-        <td style="white-space:nowrap;"><b>Q4</b></td>
-        <td>JOURNAL</td>
-        <td style="white-space:nowrap;" align="right"><b>05</b></td>
-    </tr>
+<!-- Q3 -->
+<tr>
+<td align="center" style="white-space:nowrap;"><b>Q3</b></td>
+<td>VIVA</td>
+<td align="center" style="white-space:nowrap;"><b>05</b></td>
+</tr>
 
-    </table>
+<!-- Q4 -->
+<tr>
+<td align="center" style="white-space:nowrap;"><b>Q4</b></td>
+<td>JOURNAL</td>
+<td align="center" style="white-space:nowrap;"><b>05</b></td>
+</tr>
 
-    </body></html>`;
+</table>
+<br><br><br>
+`;
+        }
+    }
 
+    html += `</body></html>`;
     return html;
 }
 
 function openPreview(){
-    const html=buildHTML();
+    const html = buildHTML();
     if(!html) return;
-    celebrate();
-    document.getElementById("previewFrame").srcdoc=html;
-    document.getElementById("previewModal").style.display="block";
+    document.getElementById("previewFrame").srcdoc = html;
+    document.getElementById("previewModal").style.display = "block";
 }
 
 function closePreview(){
-    document.getElementById("previewModal").style.display="none";
+    document.getElementById("previewModal").style.display = "none";
 }
 
 function downloadWord(){
-    const html=buildHTML();
+    const html = buildHTML();
     if(!html) return;
-    celebrate();
-    const blob=new Blob([html],{type:"text/html"});
-    const a=document.createElement("a");
-    a.href=URL.createObjectURL(blob);
-    a.download=document.getElementById("subject").value+".doc";
+    const blob = new Blob([html], {type:"text/html"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = document.getElementById("subject").value + ".doc";
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
 }
 
 function printPaper(){
-    const html=buildHTML();
-    const w=window.open("");
+    const html = buildHTML();
+    const w = window.open("");
     w.document.write(html);
     w.document.close();
     w.print();
 }
 
-function openHelp(){
-    document.getElementById("helpModal").style.display="flex";
+function downloadPDF(){
+    printPaper();
 }
 
-function closeHelp(){
-    document.getElementById("helpModal").style.display="none";
-}
+
 </script>
 
 <footer class="footer">
-© 2026 Department of Advanced Computing  
-Nagindas Khandwala College
+  © 2026 Department of Advanced Computing,
+  Nagindas Khandwala College, Malad (W).
+  All Rights Reserved.
 </footer>
 
 </body>
