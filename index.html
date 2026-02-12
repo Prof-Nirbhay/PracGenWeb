@@ -244,18 +244,53 @@ iframe{
 </div>
 
 <!-- Help Modal -->
-<div class="help-modal" id="helpModal">
-<div class="help-box">
-<h3>How to Use</h3>
+<div id="helpModal" class="help-modal">
+  <div class="help-box">
+    <h2>How to Use the Website</h2>
 
-<div class="help-step"><span>1</span><p>Select Class & Semester</p></div>
-<div class="help-step"><span>2</span><p>Enter Subject Name</p></div>
-<div class="help-step"><span>3</span><p>Type Questions (One per line)</p></div>
-<div class="help-step"><span>4</span><p>Press TAB for Sub-question</p></div>
-<div class="help-step"><span>5</span><p>Click Generate</p></div>
+    <div class="help-step">
+      <span>1</span>
+      <p>Select <b>Class</b> and <b>Semester</b></p>
+    </div>
 
-<button class="close-btn" onclick="closeHelp()">Close</button>
-</div>
+    <div class="help-step">
+      <span>2</span>
+      <p>Enter the <b>Subject Name</b></p>
+    </div>
+
+    <div class="help-step">
+      <span>3</span>
+      <p>Add <b>Main Questions</b> (one per line)</p>
+    </div>
+
+    <!-- Main Question Instructions -->
+    <ul class="sub-points">
+      <li>Write only <b>one main question per line</b>.</li>
+      <li>Press <b>Enter</b> after each main question.</li>
+      <li>Each new line is treated as a <b>new main question</b>.</li>
+      <li>Do not combine multiple main questions in one line.</li>
+    </ul>
+
+    <div class="help-step">
+      <span>4</span>
+      <p>Add <b>Sub-Questions</b> using TAB</p>
+    </div>
+
+    <!-- Sub Question Instructions -->
+    <ul class="sub-points">
+      <li>Press <b>TAB</b> before typing a sub-question.</li>
+      <li>Sub-questions will appear as <b>(a), (b), (c)</b>.</li>
+      <li>Sub-questions belong to the previous main question.</li>
+      <li>Do not press Enter without TAB if it is a sub-question.</li>
+    </ul>
+
+    <div class="help-step">
+      <span>5</span>
+      <p>Click <b>Generate</b> to preview or download the paper</p>
+    </div>
+
+    <button class="close-btn" onclick="closeHelp()">Close</button>
+  </div>
 </div>
 
 <script>
@@ -379,3 +414,4 @@ Nagindas Khandwala College
 
 </body>
 </html>
+
