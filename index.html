@@ -111,6 +111,9 @@ iframe{
 }
 
 #helpBtn {
+  position: fixed;       /* Makes it stay at corner */
+  top: 20px;             /* Distance from top */
+  right: 20px;           /* Distance from right */
   padding: 8px 16px;
   background-color: #4CAF50;
   color: white;
@@ -118,10 +121,12 @@ iframe{
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
+  z-index: 10000;        /* Keeps it above everything */
 }
 
 #helpBtn:hover {
   background-color: #45a049;
+}
 }
 
 .help-modal {
@@ -472,4 +477,5 @@ window.onclick = function(event) {
 
 </body>
 </html>
+
 
