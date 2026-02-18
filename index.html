@@ -74,116 +74,10 @@ button:hover{
     background:#163bb3;
 }
 
-.modal{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.6);
-    z-index:1000;
-}
+/* ========================= */
+/*  NEW TEXTAREA SECTION     */
+/* ========================= */
 
-.modal-box{
-    background:#fff;
-    width:90%;
-    max-width:950px;
-    margin:30px auto;
-    padding:15px;
-}
-
-.modal-actions{
-    text-align:right;
-    margin-bottom:8px;
-}
-
-iframe{
-    width:100%;
-    height:600px;
-    border:1px solid #000;
-}
-
-.footer {
-  text-align: center;
-  font-size: 13px;
-  color: #555;
-  margin-top: 40px;
-  padding: 12px 0;
-  border-top: 1px solid #ddd;
-}
-
-#helpBtn {
-  position: fixed;       /* Makes it stay at corner */
-  top: 20px;             /* Distance from top */
-  right: 20px;           /* Distance from right */
-  padding: 8px 16px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  z-index: 10000;        /* Keeps it above everything */
-}
-
-#helpBtn:hover {
-  background-color: #45a049;
-}
-
-.help-modal {
-  display: none;
-  position: fixed;
-  z-index: 9999;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
-}
-
-.help-box {
-  background: white;
-  width: 450px;
-  margin: 8% auto;
-  padding: 20px;
-  border-radius: 10px;
-  position: relative;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.close-help {
-  position: absolute;
-  right: 15px;
-  top: 10px;
-  font-size: 22px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.help-step {
-  display: flex;
-  margin-bottom: 15px;
-}
-
-.help-step span {
-  background: #4CAF50;
-  color: white;
-  width: 25px;
-  height: 25px;
-  text-align: center;
-  border-radius: 50%;
-  margin-right: 10px;
-  font-weight: bold;
-}
-
-.sub-points {
-  margin-left: 35px;
-  font-size: 14px;
-}
-
-@keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 1;}
-}
-    
 </style>
 </head>
 
@@ -224,8 +118,13 @@ iframe{
 <label>Subject Name:</label>
 <input type="text" id="subject">
 
-<label>Questions (Enter = New Question, Tab = Sub-question):</label>
-<textarea id="questions" rows="8"></textarea>
+<!-- ✅ EASY QUESTIONS -->
+<label>Easy Questions (Enter = New Question, Tab = Sub-question):</label>
+<textarea id="easyQuestions" rows="6"></textarea>
+
+<!-- ✅ DIFFICULT QUESTIONS -->
+<label>Difficult Questions (Enter = New Question, Tab = Sub-question):</label>
+<textarea id="difficultQuestions" rows="6"></textarea>
 
 <div class="actions">
 <button onclick="openPreview()">Preview</button>
@@ -234,79 +133,27 @@ iframe{
 
 </div>
 
-<div class="modal" id="previewModal">
-<div class="modal-box">
-<div class="modal-actions">
-    <button onclick="downloadPDF()">Download PDF</button>
-    <button onclick="printPaper()">Print</button>
-    <button onclick="closePreview()">Close</button>
-</div>
-<iframe id="previewFrame"></iframe>
-</div>
-</div>
-
-<button id="helpBtn" onclick="openHelp()">❓ Help</button>
-<div id="helpModal" class="help-modal">
-  <div class="help-box">
-
-    <span class="close-help" onclick="closeHelp()">&times;</span>
-
-    <h2>How to Use the Website</h2>
-
-    <div class="help-step">
-      <span>1</span>
-      <p>Select <b>Class</b> and <b>Semester</b></p>
-    </div>
-
-    <div class="help-step">
-      <span>2</span>
-      <p>Enter the <b>Subject Name</b></p>
-    </div>
-
-    <div class="help-step">
-      <span>3</span>
-      <p>Add <b>Practical Questions</b> (one per line)</p>
-        </div>
-      <div class="help-step">
-        <ul class="sub-points">
-        <li>Write only <b>one question per line</b>.</li>
-        <li>Press <b>Enter</b> after each question.</li>
-        <li>Use <b>Enter+TAB</b> for sub-questions.</li>
-        <li>Each line is treated as a <b>Separate Question</b> Except <b>Enter+Tab</b>.</li>
-      </ul>
-    </div>
-    <div class="help-step">
-      <span>4</span>
-      <p>Click <b>Preview</b> to print or download PDF</p>
-    </div>
-
-    <div class="help-step">
-      <span>5</span>
-      <p>Click <b>Download Word</b> for final submission</p>
-    </div>
-  </div>
-</div>
-    
 <script>
 
-    /* Allow TAB inside textarea */
-document.getElementById("questions").addEventListener("keydown", function(e) {
-    if (e.key === "Tab") {
-        e.preventDefault();
-        const start = this.selectionStart;
-        const end = this.selectionEnd;
-        this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
-        this.selectionStart = this.selectionEnd = start + 1;
-    }
-});
+/* Enable TAB for both textareas */
+function enableTab(id){
+    document.getElementById(id).addEventListener("keydown", function(e){
+        if(e.key === "Tab"){
+            e.preventDefault();
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
+            this.selectionStart = this.selectionEnd = start + 1;
+        }
+    });
+}
 
-function buildHTML(){
+enableTab("easyQuestions");
+enableTab("difficultQuestions");
 
-    const cls = document.getElementById("class").value;
-    const sem = document.getElementById("semester").value;
-    const subject = document.getElementById("subject").value.trim();
-
-    const rawLines = document.getElementById("questions").value
+/* Parse Questions */
+function parseQuestions(textareaId){
+    const rawLines = document.getElementById(textareaId).value
         .split(/\r?\n/)
         .filter(line => line.trim() !== "");
 
@@ -329,8 +176,21 @@ function buildHTML(){
 
     if(current) qs.push(current);
 
-    if(!subject || qs.length < 2){
-        alert("Enter subject name and at least two main questions.");
+    return qs;
+}
+
+/* Build HTML */
+function buildHTML(){
+
+    const cls = document.getElementById("class").value;
+    const sem = document.getElementById("semester").value;
+    const subject = document.getElementById("subject").value.trim();
+
+    const easyQs = parseQuestions("easyQuestions");
+    const difficultQs = parseQuestions("difficultQuestions");
+
+    if(!subject || easyQs.length < 1 || difficultQs.length < 1){
+        alert("Enter subject, at least one easy question and one difficult question.");
         return null;
     }
 
@@ -339,8 +199,9 @@ function buildHTML(){
     <body style="font-family:'Times New Roman'; font-size:12pt; font-weight:bold;">
     `;
 
-    for(let i=0; i<qs.length; i++){
-        for(let j=i+1; j<qs.length; j++){
+    /* EASY × DIFFICULT COMBINATION */
+    for(let i=0; i<easyQs.length; i++){
+        for(let j=0; j<difficultQs.length; j++){
 
 html += `
 <table width="100%" cellpadding="6" cellspacing="0">
@@ -377,42 +238,40 @@ ${cls} SEM ${sem} PRACTICAL EXAMINATION FEBRUARY- 2026
 </td>
 </tr>
 
-<!-- Q1 -->
+<!-- EASY QUESTION -->
 <tr>
-<td align="center" style="white-space:nowrap;"><b>Q1</b></td>
+<td align="center"><b>Q1</b></td>
 <td width="100%">
-${qs[i].main}
-${qs[i].sub.map((s,index)=>
+${easyQs[i].main}
+${easyQs[i].sub.map((s,index)=>
 `<div style="margin-left:25px;">(${String.fromCharCode(97+index)}) ${s}</div>`
 ).join("")}
 </td>
-<td align="center" style="white-space:nowrap;"><b>20</b></td>
+<td align="center"><b>20</b></td>
 </tr>
 
-<!-- Q2 -->
+<!-- DIFFICULT QUESTION -->
 <tr>
-<td align="center" style="white-space:nowrap;"><b>Q2</b></td>
+<td align="center"><b>Q2</b></td>
 <td width="100%">
-${qs[j].main}
-${qs[j].sub.map((s,index)=>
+${difficultQs[j].main}
+${difficultQs[j].sub.map((s,index)=>
 `<div style="margin-left:25px;">(${String.fromCharCode(97+index)}) ${s}</div>`
 ).join("")}
 </td>
-<td align="center" style="white-space:nowrap;"><b>20</b></td>
+<td align="center"><b>20</b></td>
 </tr>
 
-<!-- Q3 -->
 <tr>
-<td align="center" style="white-space:nowrap;"><b>Q3</b></td>
+<td align="center"><b>Q3</b></td>
 <td>VIVA</td>
-<td align="center" style="white-space:nowrap;"><b>05</b></td>
+<td align="center"><b>05</b></td>
 </tr>
 
-<!-- Q4 -->
 <tr>
-<td align="center" style="white-space:nowrap;"><b>Q4</b></td>
+<td align="center"><b>Q4</b></td>
 <td>JOURNAL</td>
-<td align="center" style="white-space:nowrap;"><b>05</b></td>
+<td align="center"><b>05</b></td>
 </tr>
 
 </table>
@@ -428,12 +287,9 @@ ${qs[j].sub.map((s,index)=>
 function openPreview(){
     const html = buildHTML();
     if(!html) return;
-    document.getElementById("previewFrame").srcdoc = html;
-    document.getElementById("previewModal").style.display = "block";
-}
-
-function closePreview(){
-    document.getElementById("previewModal").style.display = "none";
+    const w = window.open("");
+    w.document.write(html);
+    w.document.close();
 }
 
 function downloadWord(){
@@ -448,46 +304,13 @@ function downloadWord(){
     document.body.removeChild(a);
 }
 
-function printPaper(){
-    const html = buildHTML();
-    const w = window.open("");
-    w.document.write(html);
-    w.document.close();
-    w.print();
-}
-
-function downloadPDF(){
-    printPaper();
-}
-
-function openHelp(){
-  document.getElementById("helpModal").style.display = "block";
-}
-
-function closeHelp(){
-  document.getElementById("helpModal").style.display = "none";
-}
-
-window.onclick = function(event) {
-  const modal = document.getElementById("helpModal");
-  if (event.target === modal) {
-    modal.style.display = "none";
-  }
-}
-
-
 </script>
 
-<footer class="footer">
-  © 2026 Department of Advanced Computing,
-  Nagindas Khandwala College, Malad (W).
-  All Rights Reserved.
+<footer style="text-align:center;margin-top:40px;">
+© 2026 Department of Advanced Computing,
+Nagindas Khandwala College, Malad (W).
+All Rights Reserved.
 </footer>
 
 </body>
 </html>
-
-
-
-
-
