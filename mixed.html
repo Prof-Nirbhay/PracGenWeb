@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PracGenWeb</title>
+
+<style>
+body{
+    font-family:"Times New Roman", Times, serif;
+    background:#eef1f5;
+    margin:0;
+    padding:0;
+}
+
+.container{
+    max-width:900px;
+    margin:30px auto;
+    background:#fff;
+    padding:25px;
+    border-radius:8px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.15);
+}
+
+.header{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    border-bottom:2px solid #1f4fd8;
+    padding-bottom:10px;
+    margin-bottom:15px;
+}
+
+.header img{
+    height:70px;
+}
+
+.header-text{
+    text-align:center;
+    flex:1;
+}
+
+label{
+    font-weight:bold;
+    display:block;
+    margin-top:10px;
+}
+
+input, textarea, select{
+    width:100%;
+    padding:6px;
+    font-family:"Times New Roman", Times, serif;
+    font-size:12pt;
+    margin-top:4px;
+}
+
+.actions{
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    margin-top:20px;
+}
+
+button{
+    padding:8px 18px;
+    font-size:12pt;
+    border:none;
+    border-radius:4px;
+    cursor:pointer;
+    background:#1f4fd8;
+    color:#fff;
+}
+
+button:hover{
+    background:#163bb3;
+}
+
+/* ========================= */
+/*  NEW TEXTAREA SECTION     */
+/* ========================= */
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+    <img src="college_logo.png" alt="College Logo">
+    <div class="header-text">
+        <h2>Practical Exam Question Paper Generator</h2>
+        <h4>DEPARTMENT OF ADVANCED COMPUTING</h4>
+    </div>
+</div>
+
+<label>Class:</label>
+<select id="class">
+<option>FYBSc CS AIML</option>
+<option>SYBSc CS AIML</option>
+<option>TYBSc CS AIML</option>
+<option>FYBSc CS CTIS</option>
+<option>SYBSc CS CTIS</option>
+<option>TYBSc CS CTIS</option>
+<option>FYMSc CS</option>
+<option>SYMSc CS</option>
+<option>FYMSc CS (CYBER)</option>
+<option>SYMSc CS (CYBER)</option>
+<option>SYBSc IT</option>
+<option>FYBSc IT</option>
+</select>
+
+<label>Semester:</label>
+<select id="semester">
+<option>I</option><option>II</option><option>III</option>
+<option>IV</option><option>V</option><option>VI</option>
+</select>
+
+<label>Subject Name:</label>
+<input type="text" id="subject">
+
+<!-- ✅ EASY QUESTIONS -->
+<label>Easy Questions (Enter = New Question, Tab = Sub-question):</label>
+<textarea id="easyQuestions" rows="6"></textarea>
+
+<!-- ✅ DIFFICULT QUESTIONS -->
+<label>Difficult Questions (Enter = New Question, Tab = Sub-question):</label>
+<textarea id="difficultQuestions" rows="6"></textarea>
+
+<div class="actions">
+<button onclick="openPreview()">Preview</button>
+<button onclick="downloadWord()">Download Word</button>
+</div>
+
+</div>
+
+<script>
+
+/* Enable TAB for both textareas */
+function enableTab(id){
+    document.getElementById(id).addEventListener("keydown", function(e){
+        if(e.key === "Tab"){
+            e.preventDefault();
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
+            this.selectionStart = this.selectionEnd = start + 1;
+        }
+    });
+}
+
+enableTab("easyQuestions");
+enableTab("difficultQuestions");
+
+/* Parse Questions */
+function parseQuestions(textareaId){
+    const rawLines = document.getElementById(textareaId).value
+        .split(/\r?\n/)
+        .filter(line => line.trim() !== "");
+
+    let qs = [];
+    let current = null;
+
+    rawLines.forEach(line => {
+        if(line.startsWith("\t")){
+            if(current){
+                current.sub.push(line.trim());
+            }
+        } else {
+            if(current) qs.push(current);
+            current = {
+                main: line.trim(),
+                sub: []
+            };
+        }
+    });
+
+    if(current) qs.push(current);
+
+    return qs;
+}
+
+/* Build HTML */
+function buildHTML(){
+
+    const cls = document.getElementById("class").value;
+    const sem = document.getElementById("semester").value;
+    const subject = document.getElementById("subject").value.trim();
+
+    const easyQs = parseQuestions("easyQuestions");
+    const difficultQs = parseQuestions("difficultQuestions");
+
+    if(!subject || easyQs.length < 1 || difficultQs.length < 1){
+        alert("Enter subject, at least one easy question and one difficult question.");
+        return null;
+    }
+
+    let html = `
+    <html>
+    <body style="font-family:'Times New Roman'; font-size:12pt; font-weight:bold;">
+    `;
+
+    /* EASY × DIFFICULT COMBINATION */
+    for(let i=0; i<easyQs.length; i++){
+        for(let j=0; j<difficultQs.length; j++){
+
+html += `
+<table width="100%" cellpadding="6" cellspacing="0">
+
+<tr>
+<td colspan="3" align="center">
+<b>
+NAGINDAS KHANDWALA COLLEGE, MALAD(W)<br>
+(Empowered Autonomous)<br><br>
+${cls} SEM ${sem} PRACTICAL EXAMINATION FEBRUARY- 2026
+</b>
+</td>
+</tr>
+
+<tr>
+<td colspan="3">
+<table width="100%">
+<tr>
+<td align="left">Time: 2 Hours</td>
+<td align="right">Roll No: __________</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td colspan="3">
+<table width="100%">
+<tr>
+<td align="left">Course: ${subject}</td>
+<td align="right">Marks: 50</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<!-- EASY QUESTION -->
+<tr>
+<td align="center"><b>Q1</b></td>
+<td width="100%">
+${easyQs[i].main}
+${easyQs[i].sub.map((s,index)=>
+`<div style="margin-left:25px;">(${String.fromCharCode(97+index)}) ${s}</div>`
+).join("")}
+</td>
+<td align="center"><b>20</b></td>
+</tr>
+
+<!-- DIFFICULT QUESTION -->
+<tr>
+<td align="center"><b>Q2</b></td>
+<td width="100%">
+${difficultQs[j].main}
+${difficultQs[j].sub.map((s,index)=>
+`<div style="margin-left:25px;">(${String.fromCharCode(97+index)}) ${s}</div>`
+).join("")}
+</td>
+<td align="center"><b>20</b></td>
+</tr>
+
+<tr>
+<td align="center"><b>Q3</b></td>
+<td>VIVA</td>
+<td align="center"><b>05</b></td>
+</tr>
+
+<tr>
+<td align="center"><b>Q4</b></td>
+<td>JOURNAL</td>
+<td align="center"><b>05</b></td>
+</tr>
+
+</table>
+<br><br><br>
+`;
+        }
+    }
+
+    html += `</body></html>`;
+    return html;
+}
+
+function openPreview(){
+    const html = buildHTML();
+    if(!html) return;
+    const w = window.open("");
+    w.document.write(html);
+    w.document.close();
+}
+
+function downloadWord(){
+    const html = buildHTML();
+    if(!html) return;
+    const blob = new Blob([html], {type:"text/html"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = document.getElementById("subject").value + ".doc";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+</script>
+
+<footer style="text-align:center;margin-top:40px;">
+© 2026 Department of Advanced Computing,
+Nagindas Khandwala College, Malad (W).
+All Rights Reserved.
+</footer>
+
+</body>
+</html>

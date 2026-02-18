@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Practical Exam Generator</title>
+
+<style>
+body{
+    font-family:"Times New Roman", Times, serif;
+    background:#eef1f5;
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.container{
+    background:#fff;
+    padding:40px;
+    width:500px;
+    text-align:center;
+    border-radius:8px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+
+h2{
+    margin-bottom:20px;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    font-size:14pt;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    background:#1f4fd8;
+    color:white;
+}
+
+button:hover{
+    background:#163bb3;
+}
+
+.footer{
+    margin-top:20px;
+    font-size:12px;
+    color:#555;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Practical Exam Question Paper Generator</h2>
+
+<p>Select Combination Type</p>
+
+<button onclick="goToSame()">
+Easy × Easy Combination
+</button>
+
+<button onclick="goToMixed()">
+Easy × Difficult Combination
+</button>
+
+<div class="footer">
+© 2026 Department of Advanced Computing<br>
+Nagindas Khandwala College, Malad (W)
+</div>
+
+</div>
+
+<script>
+
+function goToSame(){
+    window.location.href = "same.html";
+}
+
+function goToMixed(){
+    window.location.href = "mixed.html";
+}
+
+</script>
+
+</body>
+</html>
