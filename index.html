@@ -21,22 +21,28 @@ body{
     box-shadow:0 4px 12px rgba(0,0,0,0.15);
 }
 
-.header{
-    display:flex;
-    align-items:center;
-    gap:15px;
-    border-bottom:2px solid #1f4fd8;
-    padding-bottom:10px;
-    margin-bottom:15px;
+.hidden{
+    display:none;
 }
 
-.header img{
-    height:70px;
-}
-
-.header-text{
+.center-box{
     text-align:center;
-    flex:1;
+    padding:40px;
+}
+
+button{
+    padding:10px 20px;
+    font-size:12pt;
+    border:none;
+    border-radius:4px;
+    cursor:pointer;
+    background:#1f4fd8;
+    color:#fff;
+    margin:10px;
+}
+
+button:hover{
+    background:#163bb3;
 }
 
 label{
@@ -48,110 +54,124 @@ label{
 input, textarea, select{
     width:100%;
     padding:6px;
-    font-family:"Times New Roman", Times, serif;
+    font-family:"Times New Roman";
     font-size:12pt;
     margin-top:4px;
 }
-
-.actions{
-    display:flex;
-    justify-content:center;
-    gap:15px;
-    margin-top:20px;
-}
-
-button{
-    padding:8px 18px;
-    font-size:12pt;
-    border:none;
-    border-radius:4px;
-    cursor:pointer;
-    background:#1f4fd8;
-    color:#fff;
-}
-
-button:hover{
-    background:#163bb3;
-}
-
-/* ========================= */
-/*  NEW TEXTAREA SECTION     */
-/* ========================= */
-
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<!-- ================= INTRO PAGE ================= -->
 
-<div class="header">
-    <img src="college_logo.png" alt="College Logo">
-    <div class="header-text">
+<div class="container" id="introPage">
+    <div class="center-box">
         <h2>Practical Exam Question Paper Generator</h2>
-        <h4>DEPARTMENT OF ADVANCED COMPUTING</h4>
+        <h3>Select Combination Type</h3>
+
+        <button onclick="startGenerator('same')">
+            Easy × Easy Combination
+        </button>
+
+        <button onclick="startGenerator('mixed')">
+            Easy × Difficult Combination
+        </button>
     </div>
 </div>
+
+<!-- ================= MAIN GENERATOR ================= -->
+
+<div class="container hidden" id="mainPage">
+
+<h2>DEPARTMENT OF ADVANCED COMPUTING</h2>
 
 <label>Class:</label>
 <select id="class">
 <option>FYBSc CS AIML</option>
 <option>SYBSc CS AIML</option>
 <option>TYBSc CS AIML</option>
-<option>FYBSc CS CTIS</option>
-<option>SYBSc CS CTIS</option>
-<option>TYBSc CS CTIS</option>
-<option>FYMSc CS</option>
-<option>SYMSc CS</option>
-<option>FYMSc CS (CYBER)</option>
-<option>SYMSc CS (CYBER)</option>
 <option>SYBSc IT</option>
 <option>FYBSc IT</option>
 </select>
 
 <label>Semester:</label>
 <select id="semester">
-<option>I</option><option>II</option><option>III</option>
-<option>IV</option><option>V</option><option>VI</option>
+<option>I</option><option>II</option>
+<option>III</option><option>IV</option>
+<option>V</option><option>VI</option>
 </select>
 
 <label>Subject Name:</label>
 <input type="text" id="subject">
 
-<!-- ✅ EASY QUESTIONS -->
-<label>Easy Questions (Enter = New Question, Tab = Sub-question):</label>
-<textarea id="easyQuestions" rows="6"></textarea>
+<!-- SAME DIFFICULTY -->
+<div id="sameBox" class="hidden">
+<label>Questions (All Same Level)</label>
+<textarea id="sameQuestions" rows="8"></textarea>
+</div>
 
-<!-- ✅ DIFFICULT QUESTIONS -->
-<label>Difficult Questions (Enter = New Question, Tab = Sub-question):</label>
-<textarea id="difficultQuestions" rows="6"></textarea>
+<!-- MIXED -->
+<div id="mixedBox" class="hidden">
+<label>Easy Questions</label>
+<textarea id="easyQuestions" rows="5"></textarea>
 
-<div class="actions">
+<label>Difficult Questions</label>
+<textarea id="difficultQuestions" rows="5"></textarea>
+</div>
+
+<br>
 <button onclick="openPreview()">Preview</button>
 <button onclick="downloadWord()">Download Word</button>
-</div>
+<button onclick="goBack()">Back</button>
 
 </div>
 
 <script>
 
-/* Enable TAB for both textareas */
+let mode = "";
+
+/* ================= INTRO CONTROL ================= */
+
+function startGenerator(type){
+    mode = type;
+    document.getElementById("introPage").classList.add("hidden");
+    document.getElementById("mainPage").classList.remove("hidden");
+
+    if(type === "same"){
+        document.getElementById("sameBox").classList.remove("hidden");
+    }else{
+        document.getElementById("mixedBox").classList.remove("hidden");
+    }
+}
+
+function goBack(){
+    location.reload();
+}
+
+/* ================= TAB SUPPORT ================= */
+
 function enableTab(id){
-    document.getElementById(id).addEventListener("keydown", function(e){
-        if(e.key === "Tab"){
+    document.addEventListener("keydown", function(e){
+        if(e.target.id === id && e.key === "Tab"){
             e.preventDefault();
-            const start = this.selectionStart;
-            const end = this.selectionEnd;
-            this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
-            this.selectionStart = this.selectionEnd = start + 1;
+            const start = e.target.selectionStart;
+            const end = e.target.selectionEnd;
+            e.target.value =
+                e.target.value.substring(0,start) + "\t" +
+                e.target.value.substring(end);
+            e.target.selectionStart =
+            e.target.selectionEnd = start + 1;
         }
     });
 }
 
+enableTab("sameQuestions");
 enableTab("easyQuestions");
 enableTab("difficultQuestions");
 
-/* Parse Questions */
+/* ================= PARSE FUNCTION ================= */
+
 function parseQuestions(textareaId){
     const rawLines = document.getElementById(textareaId).value
         .split(/\r?\n/)
@@ -167,10 +187,7 @@ function parseQuestions(textareaId){
             }
         } else {
             if(current) qs.push(current);
-            current = {
-                main: line.trim(),
-                sub: []
-            };
+            current = { main: line.trim(), sub: [] };
         }
     });
 
@@ -179,104 +196,37 @@ function parseQuestions(textareaId){
     return qs;
 }
 
-/* Build HTML */
+/* ================= BUILD HTML ================= */
+
 function buildHTML(){
 
     const cls = document.getElementById("class").value;
     const sem = document.getElementById("semester").value;
     const subject = document.getElementById("subject").value.trim();
 
-    const easyQs = parseQuestions("easyQuestions");
-    const difficultQs = parseQuestions("difficultQuestions");
+    let html = `<html><body style="font-family:'Times New Roman'; font-weight:bold;">`;
 
-    if(!subject || easyQs.length < 1 || difficultQs.length < 1){
-        alert("Enter subject, at least one easy question and one difficult question.");
-        return null;
-    }
+    if(mode === "same"){
 
-    let html = `
-    <html>
-    <body style="font-family:'Times New Roman'; font-size:12pt; font-weight:bold;">
-    `;
+        const qs = parseQuestions("sameQuestions");
 
-    /* EASY × DIFFICULT COMBINATION */
-    for(let i=0; i<easyQs.length; i++){
-        for(let j=0; j<difficultQs.length; j++){
+        for(let i=0;i<qs.length;i++){
+            for(let j=i+1;j<qs.length;j++){
 
-html += `
-<table width="100%" cellpadding="6" cellspacing="0">
+                html += generatePaper(cls,sem,subject,qs[i],qs[j]);
+            }
+        }
 
-<tr>
-<td colspan="3" align="center">
-<b>
-NAGINDAS KHANDWALA COLLEGE, MALAD(W)<br>
-(Empowered Autonomous)<br><br>
-${cls} SEM ${sem} PRACTICAL EXAMINATION FEBRUARY- 2026
-</b>
-</td>
-</tr>
+    }else{
 
-<tr>
-<td colspan="3">
-<table width="100%">
-<tr>
-<td align="left">Time: 2 Hours</td>
-<td align="right">Roll No: __________</td>
-</tr>
-</table>
-</td>
-</tr>
+        const easy = parseQuestions("easyQuestions");
+        const difficult = parseQuestions("difficultQuestions");
 
-<tr>
-<td colspan="3">
-<table width="100%">
-<tr>
-<td align="left">Course: ${subject}</td>
-<td align="right">Marks: 50</td>
-</tr>
-</table>
-</td>
-</tr>
+        for(let i=0;i<easy.length;i++){
+            for(let j=0;j<difficult.length;j++){
 
-<!-- EASY QUESTION -->
-<tr>
-<td align="center"><b>Q1</b></td>
-<td width="100%">
-${easyQs[i].main}
-${easyQs[i].sub.map((s,index)=>
-`<div style="margin-left:25px;">(${String.fromCharCode(97+index)}) ${s}</div>`
-).join("")}
-</td>
-<td align="center"><b>20</b></td>
-</tr>
-
-<!-- DIFFICULT QUESTION -->
-<tr>
-<td align="center"><b>Q2</b></td>
-<td width="100%">
-${difficultQs[j].main}
-${difficultQs[j].sub.map((s,index)=>
-`<div style="margin-left:25px;">(${String.fromCharCode(97+index)}) ${s}</div>`
-).join("")}
-</td>
-<td align="center"><b>20</b></td>
-</tr>
-
-<tr>
-<td align="center"><b>Q3</b></td>
-<td>VIVA</td>
-<td align="center"><b>05</b></td>
-</tr>
-
-<tr>
-<td align="center"><b>Q4</b></td>
-<td>JOURNAL</td>
-<td align="center"><b>05</b></td>
-</tr>
-
-</table>
-<br><br><br>
-`;
+                html += generatePaper(cls,sem,subject,easy[i],difficult[j]);
+            }
         }
     }
 
@@ -284,9 +234,50 @@ ${difficultQs[j].sub.map((s,index)=>
     return html;
 }
 
+/* ================= PAPER TEMPLATE ================= */
+
+function generatePaper(cls,sem,subject,q1,q2){
+
+return `
+<table width="100%" cellpadding="6">
+
+<tr>
+<td colspan="3" align="center">
+<b>
+NAGINDAS KHANDWALA COLLEGE, MALAD(W)<br>
+${cls} SEM ${sem} PRACTICAL EXAMINATION 2026
+</b>
+</td>
+</tr>
+
+<tr>
+<td><b>Q1</b></td>
+<td>${q1.main}
+${q1.sub.map((s,i)=>`<div style="margin-left:25px;">(${String.fromCharCode(97+i)}) ${s}</div>`).join("")}
+</td>
+<td><b>20</b></td>
+</tr>
+
+<tr>
+<td><b>Q2</b></td>
+<td>${q2.main}
+${q2.sub.map((s,i)=>`<div style="margin-left:25px;">(${String.fromCharCode(97+i)}) ${s}</div>`).join("")}
+</td>
+<td><b>20</b></td>
+</tr>
+
+<tr><td><b>Q3</b></td><td>VIVA</td><td><b>05</b></td></tr>
+<tr><td><b>Q4</b></td><td>JOURNAL</td><td><b>05</b></td></tr>
+
+</table>
+<br><br>
+`;
+}
+
+/* ================= OUTPUT ================= */
+
 function openPreview(){
     const html = buildHTML();
-    if(!html) return;
     const w = window.open("");
     w.document.write(html);
     w.document.close();
@@ -294,23 +285,14 @@ function openPreview(){
 
 function downloadWord(){
     const html = buildHTML();
-    if(!html) return;
     const blob = new Blob([html], {type:"text/html"});
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = document.getElementById("subject").value + ".doc";
-    document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
 }
 
 </script>
-
-<footer style="text-align:center;margin-top:40px;">
-© 2026 Department of Advanced Computing,
-Nagindas Khandwala College, Malad (W).
-All Rights Reserved.
-</footer>
 
 </body>
 </html>
