@@ -124,6 +124,7 @@ body{
     padding:40px;
     border-radius:20px;
     box-shadow:0 25px 50px rgba(0,0,0,0.25);
+    transition:0.3s ease;
 }
 
 .exam-main-title{
@@ -218,7 +219,7 @@ body{
 /* Iframe */
 iframe{
     width:100%;
-    height:650px;
+    height:750px;
     border:none;
     margin-top:20px;
     display:none;
@@ -360,11 +361,12 @@ function showExam(){
     hideAll();
     document.getElementById("examSection").style.display="block";
 
-    /* RESET TO DEFAULT STATE */
     document.getElementById("examContent").style.display="block";
     document.getElementById("contentFrame").style.display="none";
     document.getElementById("backButton").style.display="none";
     document.getElementById("contentFrame").src = "";
+
+    document.querySelector(".exam-wrapper").style.padding = "40px";
 }
 
 function showAbout(){
@@ -377,6 +379,8 @@ function openGenerator(page){
     document.getElementById("contentFrame").style.display="block";
     document.getElementById("backButton").style.display="inline-block";
     document.getElementById("contentFrame").src = page;
+
+    document.querySelector(".exam-wrapper").style.padding = "10px";
 }
 
 function goBack(){
@@ -384,6 +388,8 @@ function goBack(){
     document.getElementById("contentFrame").style.display="none";
     document.getElementById("backButton").style.display="none";
     document.getElementById("contentFrame").src = "";
+
+    document.querySelector(".exam-wrapper").style.padding = "40px";
 }
 
 </script>
