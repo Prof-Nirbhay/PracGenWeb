@@ -73,11 +73,6 @@ button{
 button:hover{
     background:#163bb3;
 }
-
-/* ========================= */
-/*  NEW TEXTAREA SECTION     */
-/* ========================= */
-
 </style>
 </head>
 
@@ -118,12 +113,10 @@ button:hover{
 <label>Subject Name:</label>
 <input type="text" id="subject">
 
-<!-- ✅ EASY QUESTIONS -->
-<label>Easy Questions (Enter = New Question, Tab = Sub-question):</label>
+<label>Easy Questions (Enter = New Question, Tab = Sub-question, Tab+Tab = Sub-sub-question):</label>
 <textarea id="easyQuestions" rows="6"></textarea>
 
-<!-- ✅ DIFFICULT QUESTIONS -->
-<label>Difficult Questions (Enter = New Question, Tab = Sub-question):</label>
+<label>Difficult Questions (Enter = New Question, Tab = Sub-question, Tab+Tab = Sub-sub-question):</label>
 <textarea id="difficultQuestions" rows="6"></textarea>
 
 <div class="actions">
@@ -135,7 +128,7 @@ button:hover{
 
 <script>
 
-/* Enable TAB for both textareas */
+/* Enable TAB inside textarea */
 function enableTab(id){
     document.getElementById(id).addEventListener("keydown", function(e){
         if(e.key === "Tab"){
@@ -151,37 +144,66 @@ function enableTab(id){
 enableTab("easyQuestions");
 enableTab("difficultQuestions");
 
-/* Parse Questions */
+/* Parse Questions with Sub and Sub-Sub Questions */
 function parseQuestions(textareaId){
-    const rawLines = document.getElementById(textareaId).value
-        .split(/\r?\n/)
-        .filter(line => line.trim() !== "");
+    const lines = document.getElementById(textareaId).value
+        .split(/\r?\n/).filter(l => l.trim() !== "");
 
-    let qs = [];
-    let current = null;
+    const root = [];
+    const stack = [{level:-1, children: root}];
 
-    rawLines.forEach(line => {
-        if(line.startsWith("\t")){
-            if(current){
-                current.sub.push(line.trim());
-            }
-        } else {
-            if(current) qs.push(current);
-            current = {
-                main: line.trim(),
-                sub: []
-            };
+    lines.forEach(line => {
+        const match = line.match(/^(\t*)(.*)/);
+        const level = match[1].length;
+        const text = match[2].trim();
+        if(!text) return;
+
+        const node = {main: text, sub: []};
+
+        while(stack.length && stack[stack.length-1].level >= level){
+            stack.pop();
         }
+
+        stack[stack.length-1].children.push(node);
+        stack.push({level: level, children: node.sub});
     });
 
-    if(current) qs.push(current);
-
-    return qs;
+    return root;
 }
 
-/* Build HTML */
-function buildHTML(){
+/* Render Questions with Sub/Sub-Sub */
+function renderSubQuestions(subQs, level){
+    if(!subQs || subQs.length===0) return "";
+    let html = "";
+    subQs.forEach((q, idx)=>{
+        if(level===0){
+            // first-level sub-question: letters
+            const label = String.fromCharCode(97+idx);
+            html += `<div style="margin-left:${25*(level+1)}px;">(${label}) ${q.main}</div>`;
+        } else {
+            // sub-sub-question (bullet)
+            html += `<div style="margin-left:${25*(level+1)}px;">&bull; ${q.main}</div>`;
+        }
+        html += renderSubQuestions(q.sub, level+1);
+    });
+    return html;
+}
 
+/* Render main questions Q1, Q2 */
+function renderQuestions(qs, qNum){
+    return qs.map(q=>{
+        return `<tr>
+<td align="center"><b>Q${qNum}</b></td>
+<td width="100%">
+${q.main}
+${renderSubQuestions(q.sub, 0)}
+</td>
+<td align="center"><b>20</b></td>
+</tr>`;
+    }).join("");
+}
+
+function buildHTML(){
     const cls = document.getElementById("class").value;
     const sem = document.getElementById("semester").value;
     const subject = document.getElementById("subject").value.trim();
@@ -189,23 +211,16 @@ function buildHTML(){
     const easyQs = parseQuestions("easyQuestions");
     const difficultQs = parseQuestions("difficultQuestions");
 
-    if(!subject || easyQs.length < 1 || difficultQs.length < 1){
-        alert("Enter subject, at least one easy question and one difficult question.");
+    if(!subject || easyQs.length<1 || difficultQs.length<1){
+        alert("Enter subject and at least one easy & difficult question.");
         return null;
     }
 
-    let html = `
-    <html>
-    <body style="font-family:'Times New Roman'; font-size:12pt; font-weight:bold;">
-    `;
+    let html = `<html><body style="font-family:'Times New Roman'; font-size:12pt; font-weight:bold;">`;
 
-    /* EASY × DIFFICULT COMBINATION */
-    for(let i=0; i<easyQs.length; i++){
-        for(let j=0; j<difficultQs.length; j++){
-
-html += `
-<table width="100%" cellpadding="6" cellspacing="0">
-
+    for(let i=0;i<easyQs.length;i++){
+        for(let j=0;j<difficultQs.length;j++){
+html += `<table width="100%" cellpadding="6" cellspacing="0">
 <tr>
 <td colspan="3" align="center">
 <b>
@@ -218,65 +233,22 @@ ${cls} SEM ${sem} PRACTICAL EXAMINATION FEBRUARY- 2026
 
 <tr>
 <td colspan="3">
-<table width="100%">
-<tr>
-<td align="left">Time: 2 Hours</td>
-<td align="right">Roll No: __________</td>
-</tr>
-</table>
+<table width="100%"><tr><td align="left">Time: 2 Hours</td><td align="right">Roll No: __________</td></tr></table>
 </td>
 </tr>
 
 <tr>
 <td colspan="3">
-<table width="100%">
-<tr>
-<td align="left">Course: ${subject}</td>
-<td align="right">Marks: 50</td>
-</tr>
-</table>
+<table width="100%"><tr><td align="left">Course: ${subject}</td><td align="right">Marks: 50</td></tr></table>
 </td>
 </tr>
 
-<!-- EASY QUESTION -->
-<tr>
-<td align="center"><b>Q1</b></td>
-<td width="100%">
-${easyQs[i].main}
-${easyQs[i].sub.map((s,index)=>
-`<div style="margin-left:25px;">(${String.fromCharCode(97+index)}) ${s}</div>`
-).join("")}
-</td>
-<td align="center"><b>20</b></td>
-</tr>
+${renderQuestions([easyQs[i]],1)}
+${renderQuestions([difficultQs[j]],2)}
 
-<!-- DIFFICULT QUESTION -->
-<tr>
-<td align="center"><b>Q2</b></td>
-<td width="100%">
-${difficultQs[j].main}
-${difficultQs[j].sub.map((s,index)=>
-`<div style="margin-left:25px;">(${String.fromCharCode(97+index)}) ${s}</div>`
-).join("")}
-</td>
-<td align="center"><b>20</b></td>
-</tr>
-
-<tr>
-<td align="center"><b>Q3</b></td>
-<td>VIVA</td>
-<td align="center"><b>05</b></td>
-</tr>
-
-<tr>
-<td align="center"><b>Q4</b></td>
-<td>JOURNAL</td>
-<td align="center"><b>05</b></td>
-</tr>
-
-</table>
-<br><br><br>
-`;
+<tr><td align="center"><b>Q3</b></td><td>VIVA</td><td align="center"><b>05</b></td></tr>
+<tr><td align="center"><b>Q4</b></td><td>JOURNAL</td><td align="center"><b>05</b></td></tr>
+</table><br><br><br>`;
         }
     }
 
@@ -295,10 +267,10 @@ function openPreview(){
 function downloadWord(){
     const html = buildHTML();
     if(!html) return;
-    const blob = new Blob([html], {type:"text/html"});
+    const blob = new Blob([html], {type:"text/html;charset=utf-8"});
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = document.getElementById("subject").value + ".doc";
+    a.download = document.getElementById("subject").value+".doc";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -307,9 +279,7 @@ function downloadWord(){
 </script>
 
 <footer style="text-align:center;margin-top:40px;">
-© 2026 Department of Advanced Computing,
-Nagindas Khandwala College, Malad (W).
-All Rights Reserved.
+© 2026 Department of Advanced Computing, Nagindas Khandwala College, Malad (W). All Rights Reserved.
 </footer>
 
 </body>
