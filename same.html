@@ -111,9 +111,9 @@ iframe{
 }
 
 #helpBtn {
-  position: fixed;       /* Makes it stay at corner */
-  top: 20px;             /* Distance from top */
-  right: 20px;           /* Distance from right */
+  position: fixed;
+  top: 20px;
+  right: 20px;
   padding: 8px 16px;
   background-color: #4CAF50;
   color: white;
@@ -121,7 +121,7 @@ iframe{
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  z-index: 10000;        /* Keeps it above everything */
+  z-index: 10000;
 }
 
 #helpBtn:hover {
@@ -183,7 +183,6 @@ iframe{
   from {opacity: 0;}
   to {opacity: 1;}
 }
-    
 </style>
 </head>
 
@@ -224,7 +223,7 @@ iframe{
 <label>Subject Name:</label>
 <input type="text" id="subject">
 
-<label>Questions (Enter = New Question, Tab = Sub-question):</label>
+<label>Questions (Enter = New Question, Tab = Sub-question, Tab+Tab = Sub-sub-question):</label>
 <textarea id="questions" rows="8"></textarea>
 
 <div class="actions">
@@ -248,9 +247,7 @@ iframe{
 <button id="helpBtn" onclick="openHelp()">❓ Help</button>
 <div id="helpModal" class="help-modal">
   <div class="help-box">
-
     <span class="close-help" onclick="closeHelp()">&times;</span>
-
     <h2>How to Use the Website</h2>
 
     <div class="help-step">
@@ -265,16 +262,15 @@ iframe{
 
     <div class="help-step">
       <span>3</span>
-      <p>Add <b>Practical Questions</b> (one per line)</p>
-        </div>
-      <div class="help-step">
-        <ul class="sub-points">
+      <p>Add <b>Practical Questions</b></p>
+      <ul class="sub-points">
         <li>Write only <b>one question per line</b>.</li>
         <li>Press <b>Enter</b> after each question.</li>
-        <li>Use <b>Enter+TAB</b> for sub-questions.</li>
-        <li>Each line is treated as a <b>Separate Question</b> Except <b>Enter+Tab</b>.</li>
+        <li>Use <b>Enter + Tab</b> for sub-questions.</li>
+        <li>Use <b>Enter + Tab + Tab</b> for sub-sub-questions (bullet points).</li>
       </ul>
     </div>
+
     <div class="help-step">
       <span>4</span>
       <p>Click <b>Preview</b> to print or download PDF</p>
@@ -289,7 +285,7 @@ iframe{
     
 <script>
 
-    /* Allow TAB inside textarea */
+/* Allow TAB inside textarea */
 document.getElementById("questions").addEventListener("keydown", function(e) {
     if (e.key === "Tab") {
         e.preventDefault();
@@ -300,48 +296,88 @@ document.getElementById("questions").addEventListener("keydown", function(e) {
     }
 });
 
-function buildHTML(){
+// Parse questions with nesting
+function parseQuestions(lines) {
+    const root = [];
+    const stack = [{level:-1, children: root}];
 
+    lines.forEach(line => {
+        const match = line.match(/^(\t*)(.*)/);
+        const level = match[1].length;
+        const text = match[2].trim();
+        if(!text) return;
+
+        const node = {main: text, sub: []};
+
+        while(stack.length > 0 && stack[stack.length-1].level >= level){
+            stack.pop();
+        }
+
+        stack[stack.length-1].children.push(node);
+        stack.push({level: level, children: node.sub});
+    });
+
+    return root;
+}
+
+// Render sub-questions
+function renderSubQuestions(subQs, level) {
+    if(!subQs || subQs.length === 0) return "";
+    let html = "";
+    subQs.forEach((sq, idx) => {
+        if(level === 0){
+            // first-level sub-question: letters
+            const label = String.fromCharCode(97+idx);
+            html += `<div style="margin-left:${25*(level+1)}px;">(${label}) ${sq.main}</div>`;
+        } else {
+            // sub-sub-question: bullet point using &bull;
+            html += `<div style="margin-left:${25*(level+1)}px;">&bull; ${sq.main}</div>`;
+        }
+        html += renderSubQuestions(sq.sub, level+1);
+    });
+    return html;
+}
+
+// Render main questions
+function renderQuestions(qs, startNumber=1) {
+    let html = "";
+    qs.forEach((q, idx) => {
+        const qNum = startNumber + idx;
+        html += `
+<tr>
+<td align="center" style="white-space:nowrap;"><b>Q${qNum}</b></td>
+<td width="100%">
+${q.main}
+${renderSubQuestions(q.sub, 0)}
+</td>
+<td align="center" style="white-space:nowrap;"><b>20</b></td>
+</tr>
+`;
+    });
+    return html;
+}
+
+function buildHTML(){
     const cls = document.getElementById("class").value;
     const sem = document.getElementById("semester").value;
     const subject = document.getElementById("subject").value.trim();
 
     const rawLines = document.getElementById("questions").value
-        .split(/\r?\n/)
-        .filter(line => line.trim() !== "");
+        .split(/\r?\n/).filter(line => line.trim() !== "");
 
-    let qs = [];
-    let current = null;
-
-    rawLines.forEach(line => {
-        if(line.startsWith("\t")){
-            if(current){
-                current.sub.push(line.trim());
-            }
-        } else {
-            if(current) qs.push(current);
-            current = {
-                main: line.trim(),
-                sub: []
-            };
-        }
-    });
-
-    if(current) qs.push(current);
-
+    const qs = parseQuestions(rawLines);
     if(!subject || qs.length < 2){
         alert("Enter subject name and at least two main questions.");
         return null;
     }
 
     let html = `
-    <html>
-    <body style="font-family:'Times New Roman'; font-size:12pt; font-weight:bold;">
-    `;
+<html>
+<body style="font-family:'Times New Roman'; font-size:12pt; font-weight:bold;">
+`;
 
     for(let i=0; i<qs.length; i++){
         for(let j=i+1; j<qs.length; j++){
-
 html += `
 <table width="100%" cellpadding="6" cellspacing="0">
 
@@ -377,38 +413,15 @@ ${cls} SEM ${sem} PRACTICAL EXAMINATION FEBRUARY- 2026
 </td>
 </tr>
 
-<!-- Q1 -->
-<tr>
-<td align="center" style="white-space:nowrap;"><b>Q1</b></td>
-<td width="100%">
-${qs[i].main}
-${qs[i].sub.map((s,index)=>
-`<div style="margin-left:25px;">(${String.fromCharCode(97+index)}) ${s}</div>`
-).join("")}
-</td>
-<td align="center" style="white-space:nowrap;"><b>20</b></td>
-</tr>
+${renderQuestions([qs[i]],1)}
+${renderQuestions([qs[j]],2)}
 
-<!-- Q2 -->
-<tr>
-<td align="center" style="white-space:nowrap;"><b>Q2</b></td>
-<td width="100%">
-${qs[j].main}
-${qs[j].sub.map((s,index)=>
-`<div style="margin-left:25px;">(${String.fromCharCode(97+index)}) ${s}</div>`
-).join("")}
-</td>
-<td align="center" style="white-space:nowrap;"><b>20</b></td>
-</tr>
-
-<!-- Q3 -->
 <tr>
 <td align="center" style="white-space:nowrap;"><b>Q3</b></td>
 <td>VIVA</td>
 <td align="center" style="white-space:nowrap;"><b>05</b></td>
 </tr>
 
-<!-- Q4 -->
 <tr>
 <td align="center" style="white-space:nowrap;"><b>Q4</b></td>
 <td>JOURNAL</td>
@@ -439,7 +452,7 @@ function closePreview(){
 function downloadWord(){
     const html = buildHTML();
     if(!html) return;
-    const blob = new Blob([html], {type:"text/html"});
+    const blob = new Blob([html], {type:"text/html;charset=utf-8"});
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = document.getElementById("subject").value + ".doc";
@@ -474,7 +487,6 @@ window.onclick = function(event) {
     modal.style.display = "none";
   }
 }
-
 
 </script>
 
