@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>University Exam Duty Automation</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+<style>
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+transition:background .3s,color .3s;
+}
+
+body{
+font-family:Segoe UI,Arial;
+background:#f4f7ff;
+padding:25px;
+color:#1c2b4a;
+}
+
+body.dark{
+background:#0f172a;
+color:#e2e8f0;
+}
+
+h1{
+text-align:center;
+margin-bottom:10px;
+}
+
+.card{
+background:white;
+padding:20px;
+margin-bottom:20px;
+border-radius:10px;
+box-shadow:0 6px 14px rgba(0,0,0,0.08);
+}
+
+body.dark .card{
+background:#1e293b;
+box-shadow:0 6px 18px rgba(0,0,0,0.4);
+}
+
+textarea,input{
+width:100%;
+padding:10px;
+border-radius:6px;
+border:1px solid #cbd5e1;
+margin-top:6px;
+}
+
+body.dark textarea,
+body.dark input{
+background:#0f172a;
+border:1px solid #334155;
+color:white;
+}
+
+button{
+background:#3b82f6;
+color:white;
+border:none;
+padding:9px 16px;
+margin-top:10px;
+border-radius:6px;
+cursor:pointer;
+}
+
+button:hover{
+opacity:.9;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:12px;
+}
+
+th{
+background:#243b6b;
+color:white;
+padding:8px;
+}
+
+td{
+border:1px solid #e2e8f0;
+padding:8px;
+text-align:center;
+}
+
+body.dark td{
+border:1px solid #334155;
+}
+
+tr:nth-child(even){
+background:#f1f5f9;
+}
+
+body.dark tr:nth-child(even){
+background:#1e293b;
+}
+
+td[contenteditable]{
+background:#fff8c4;
+}
+
+body.dark td[contenteditable]{
+background:#3f3f00;
+}
+
+.conflictRow{
+background:#ff6b6b !important;
+color:white;
+}
+
+.modal{
+display:none;
+position:fixed;
+z-index:999;
+left:0;
+top:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.5);
+}
+
+.modal-content{
+background:white;
+margin:12% auto;
+padding:25px;
+width:420px;
+border-radius:10px;
+text-align:center;
+}
+
+body.dark .modal-content{
+background:#1e293b;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>📊 University Exam Duty Automation System</h1>
+
+<div style="text-align:center;margin-bottom:20px;">
+<button onclick="toggleTheme()" id="themeBtn">🌙 Dark Mode</button>
+</div>
+
+<div class="card">
+
+<h3>👨‍🏫 Faculty List</h3>
+
+<textarea id="facultyInput" placeholder="Paste faculty names (one per line)"></textarea>
+
+<button onclick="loadFaculty()">Load Faculty</button>
+
+<p id="facultyCount"></p>
+
+<table id="facultyTable">
+<thead>
+<tr>
+<th>Faculty</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+</div>
+
+<div class="card">
+
+<h3>🏫 Add Exam Rooms</h3>
+
+<label>📅 Select Date</label>
+<input type="date" id="examDate">
+
+<p>Use * if room needs two faculty</p>
+
+<textarea id="roomInput" placeholder="Example
+101
+102*
+103
+104*"></textarea>
+
+<button onclick="addRooms()">Add Rooms</button>
+<button onclick="clearRooms()">Clear Rooms</button>
+
+<table id="roomTable">
+<thead>
+<tr>
+<th>Date</th>
+<th>Room</th>
+<th>Faculty Needed</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+</div>
+
+<div class="card">
+
+<button onclick="generateDuty()">Generate Duty</button>
+<button onclick="clearDuty()">Clear Duty</button>
+
+</div>
+
+<div class="card">
+
+<h3>📋 Exam Duty Allocation</h3>
+
+<table id="dutyTable">
+<thead>
+<tr>
+<th>Date</th>
+<th>Room</th>
+<th>Faculty 1</th>
+<th>Faculty 2</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<br>
+
+<button onclick="downloadPDF()">Download PDF</button>
+<button onclick="downloadWord()">Download Word</button>
+
+</div>
+
+<div class="card">
+
+<h3>📈 Faculty Duty Statistics</h3>
+
+<table id="statsTable">
+<thead>
+<tr>
+<th>Faculty</th>
+<th>Duties</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+</div>
+
+<div id="conflictModal" class="modal">
+<div class="modal-content">
+
+<h2>⚠ Faculty Conflict</h2>
+
+<div id="conflictList"></div>
+
+<br>
+
+<button onclick="closeModal()">Close</button>
+
+</div>
+</div>
+
+<script>
+
+let faculty=[]
+let rooms=[]
+let dutyCount={}
+
+function loadFaculty(){
+
+let text=document.getElementById("facultyInput").value
+
+let names=text.split("\n").map(x=>x.trim()).filter(x=>x)
+
+faculty=[...new Set(names)]
+
+dutyCount={}
+
+faculty.forEach(f=>dutyCount[f]=0)
+
+renderFaculty()
+
+}
+
+function renderFaculty(){
+
+let tbody=document.querySelector("#facultyTable tbody")
+
+tbody.innerHTML=""
+
+faculty.forEach((f,i)=>{
+
+tbody.innerHTML+=`
+<tr>
+<td contenteditable="true" oninput="editFaculty(${i},this.innerText)">
+${f}
+</td>
+<td>
+<button onclick="deleteFaculty(${i})">Delete</button>
+</td>
+</tr>
+`
+})
+
+document.getElementById("facultyCount").innerText=
+faculty.length+" Faculty Loaded"
+
+renderStats()
+
+}
+
+function editFaculty(i,val){
+
+val=val.trim()
+
+if(faculty.includes(val) && faculty[i]!=val){
+alert("Duplicate faculty not allowed")
+renderFaculty()
+return
+}
+
+faculty[i]=val
+
+recalculateStats()
+
+}
+
+function deleteFaculty(i){
+
+faculty.splice(i,1)
+
+renderFaculty()
+
+}
+
+function addRooms(){
+
+let date=document.getElementById("examDate").value
+
+if(!date){
+alert("Select date")
+return
+}
+
+let lines=document.getElementById("roomInput").value.split("\n")
+
+lines.forEach(l=>{
+
+l=l.trim()
+
+if(!l)return
+
+let need=1
+
+if(l.endsWith("*")){
+need=2
+l=l.replace("*","")
+}
+
+let exists=rooms.some(r=>r.date==date && r.room==l)
+
+if(!exists){
+
+rooms.push({
+date:date,
+room:l,
+need:need
+})
+
+}
+
+})
+
+renderRooms()
+
+}
+
+function clearRooms(){
+
+rooms=[]
+
+renderRooms()
+
+}
+
+function renderRooms(){
+
+rooms.sort((a,b)=>new Date(a.date)-new Date(b.date))
+
+let tbody=document.querySelector("#roomTable tbody")
+
+tbody.innerHTML=""
+
+rooms.forEach((r,i)=>{
+
+tbody.innerHTML+=`
+<tr>
+<td>${r.date}</td>
+<td>${r.room}</td>
+<td>${r.need}</td>
+<td>
+<button onclick="deleteRoom(${i})">Delete</button>
+</td>
+</tr>
+`
+})
+
+}
+
+function deleteRoom(i){
+
+rooms.splice(i,1)
+
+renderRooms()
+
+}
+
+function generateDuty(){
+
+for(let f in dutyCount)dutyCount[f]=0
+
+let tbody=document.querySelector("#dutyTable tbody")
+
+tbody.innerHTML=""
+
+let grouped={}
+
+rooms.forEach(r=>{
+if(!grouped[r.date])grouped[r.date]=[]
+grouped[r.date].push(r)
+})
+
+Object.keys(grouped).sort().forEach(date=>{
+
+let used=[]
+
+grouped[date].forEach(r=>{
+
+let available=faculty.filter(f=>!used.includes(f))
+
+available.sort((a,b)=>dutyCount[a]-dutyCount[b])
+
+let f1="Not Enough Faculty"
+
+if(available.length){
+f1=available[0]
+used.push(f1)
+dutyCount[f1]++
+}
+
+let f2=""
+
+if(r.need==2){
+
+available=faculty.filter(f=>!used.includes(f))
+available.sort((a,b)=>dutyCount[a]-dutyCount[b])
+
+if(available.length){
+f2=available[0]
+used.push(f2)
+dutyCount[f2]++
+}else{
+f2="Not Enough Faculty"
+}
+
+}
+
+tbody.innerHTML+=`
+<tr>
+<td>${date}</td>
+<td>${r.room}</td>
+<td contenteditable="true" oninput="recalculateStats()">${f1}</td>
+<td contenteditable="true" oninput="recalculateStats()">${f2}</td>
+</tr>
+`
+
+})
+
+})
+
+renderStats()
+
+detectConflicts()
+
+}
+
+function clearDuty(){
+
+document.querySelector("#dutyTable tbody").innerHTML=""
+
+renderStats()
+
+}
+
+function recalculateStats(){
+
+for(let f in dutyCount)dutyCount[f]=0
+
+document.querySelectorAll("#dutyTable tbody tr").forEach(r=>{
+
+let f1=r.cells[2].innerText.trim()
+let f2=r.cells[3].innerText.trim()
+
+if(dutyCount[f1]!=undefined)dutyCount[f1]++
+if(dutyCount[f2]!=undefined)dutyCount[f2]++
+
+})
+
+renderStats()
+
+detectConflicts()
+
+}
+
+function renderStats(){
+
+let tbody=document.querySelector("#statsTable tbody")
+
+tbody.innerHTML=""
+
+for(let f in dutyCount){
+
+tbody.innerHTML+=`
+<tr>
+<td>${f}</td>
+<td>${dutyCount[f]}</td>
+</tr>
+`
+
+}
+
+}
+
+function detectConflicts(){
+
+let rows=document.querySelectorAll("#dutyTable tbody tr")
+
+let map={}
+let conflicts=[]
+
+rows.forEach(r=>r.classList.remove("conflictRow"))
+
+rows.forEach(r=>{
+
+let date=r.cells[0].innerText
+let f1=r.cells[2].innerText
+let f2=r.cells[3].innerText
+
+function check(f){
+
+if(!f || f=="Not Enough Faculty")return
+
+let key=f+"_"+date
+
+if(map[key]){
+r.classList.add("conflictRow")
+conflicts.push(f+" on "+date)
+}else{
+map[key]=true
+}
+
+}
+
+check(f1)
+check(f2)
+
+})
+
+if(conflicts.length){
+
+let list=document.getElementById("conflictList")
+
+list.innerHTML=""
+
+conflicts.forEach(c=>list.innerHTML+="<p>"+c+"</p>")
+
+document.getElementById("conflictModal").style.display="block"
+
+}
+
+}
+
+function closeModal(){
+
+document.getElementById("conflictModal").style.display="none"
+
+}
+
+function downloadPDF(){
+
+const {jsPDF}=window.jspdf
+
+let doc=new jsPDF()
+
+doc.text("EXAM DUTY CHART",105,15,{align:"center"})
+
+let rows=[]
+let prev=""
+
+document.querySelectorAll("#dutyTable tbody tr").forEach(r=>{
+
+let d=r.cells[0].innerText
+let room=r.cells[1].innerText
+let f1=r.cells[2].innerText
+let f2=r.cells[3].innerText
+
+if(d==prev)d=""
+else prev=d
+
+rows.push([d,room,f1,f2])
+
+})
+
+doc.autoTable({
+startY:25,
+head:[["Date","Room","Faculty 1","Faculty 2"]],
+body:rows
+})
+
+doc.save("ExamDuty.pdf")
+
+}
+
+function downloadWord(){
+
+let html=document.getElementById("dutyTable").outerHTML
+
+let blob=new Blob(['\ufeff',html],{type:'application/msword'})
+
+let url=URL.createObjectURL(blob)
+
+let a=document.createElement("a")
+
+a.href=url
+a.download="ExamDuty.doc"
+
+a.click()
+
+}
+
+function toggleTheme(){
+
+let body=document.body
+
+body.classList.toggle("dark")
+
+if(body.classList.contains("dark")){
+localStorage.setItem("theme","dark")
+document.getElementById("themeBtn").innerText="☀ Light Mode"
+}else{
+localStorage.setItem("theme","light")
+document.getElementById("themeBtn").innerText="🌙 Dark Mode"
+}
+
+}
+
+function loadTheme(){
+
+let saved=localStorage.getItem("theme")
+
+if(saved==="dark"){
+document.body.classList.add("dark")
+document.getElementById("themeBtn").innerText="☀ Light Mode"
+}
+
+}
+
+loadTheme()
+
+</script>
+
+</body>
+</html>
